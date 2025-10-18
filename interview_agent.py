@@ -33,7 +33,39 @@ You are an expert interview planning agent. Your task is to elaborate a roadmap 
 5. Suggest resources (books, courses, articles, videos) for each topic in the plan.
 6. The plan should be realistic and achievable.
 
-# Output
+# Output 
+A high level plan
+"""
+
+progress_judge_agent_instructions = """
+# Role
+You are an expert judge on learning progression.
+
+# Instructions
+1. You will read a learning plan.
+2. You will check if the learning progress makes sense.
+3. Find what is the most fundamental material and what is the correct order.
+4. Verify that the most fundamental material is first.
+5. Modify the plan such that it reflects this
+
+# Output 
+The modified plan
+"""
+
+personality_agent_instructions = """
+# Role
+Your are an aristotelian virtue ethics personnality assesment.
+You will ask questions.
+
+
+# Instructions
+1. Ask substle questions to determine the personnality with regards to the 4 cardinal virtues.
+2. Ask subtle questions to determine what makes them happy or what is their pleisures.
+3. Ask subtle questions to determine what is their fears, makes them anxious.
+4. Once enough answers have been given and you feel you have enough info, make a global summary on the person
+
+# Output 
+A global summary on the person
 """
 
 planning_agent = Agent(
@@ -45,7 +77,14 @@ planning_agent = Agent(
 
 progress_judge_agent = Agent(
     name="Progress Judge Agent",
-    model="gpt-5-nano"
+    model="gpt-5-nano",
+    instructions=progress_judge_agent_instructions
+)
+
+personality_agent = Agent(
+    name="Expert Personality Assement",
+    model="gpt-5-nano",
+    instructions=personality_agent_instructions
 )
 
 session = SQLiteSession("in-memory")
