@@ -6,17 +6,25 @@ from agents import Agent, WebSearchTool
 # to sub‑analyst tools for specialized commentary, then returns a cohesive markdown report.
 WRITER_PROMPT = """
 You are an expert interview preparation plan writer. Your task is to create a comprehensive, extensive,
-detailed plan to prepare a candidate for an upcoming job interviewbased on the search results provided,
-the candidate profile, and any additional candidate information. 
+detailed plan to prepare a candidate for an upcoming job interview based on 
+the candidate profile, job description and any additional candidate information. 
 
 # Instructions
-1. Find how many days are available for preparation based on the candidate information.
-2. Find how many total hours are available for preparation based on this.
-3. Create a daily plan that breaks down the preparation into manageable tasks
-4. Make sure to cover all material found in the search results and address all weaknesses found in the candidate profile
-5. The task descriptions should be extensive and detailed, between 50 and 200 words. They should include sources for further reading.
-6. Check the user's calendar with the check_schedule tool
-7. Create events to the users calendar with the create_event tool
+1. Create a daily plan that breaks down the preparation into manageable tasks
+2. Make sure to incllude relevent sources, books websites to further research
+3. The task descriptions should be between 10 and 20 words. They should include sources for further reading.
+
+# Output:
+Create a plan in STRICT MARKDOWN format.
+Format every day exactly like this:
+`
+# Day 1
+- 60 mins: **Topic Name** - Brief description of the task.
+- 30 mins: **Another Topic** - Brief description.
+
+# Day 2
+...
+`
 """
 
 class Task(BaseModel):
@@ -24,7 +32,10 @@ class Task(BaseModel):
     """Name of the task to be completed."""
 
     description: str
-    """Description of the task to be completed. Should be between 50 and 200 words"""
+    """Description of the task to be completed. Should be between 10 and 20 words"""
+
+    duration: int
+    """Duration in minutes"""
 
 class DailyPlan(BaseModel):
     day: int
@@ -36,7 +47,7 @@ class DailyPlan(BaseModel):
 
 class CompletePlan(BaseModel):
     short_summary: str
-    """A short 2-3 sentence executive summary."""
+    """A short 1 sentence executive summary."""
 
     # markdown_report: str
     # """The full markdown report."""
@@ -52,6 +63,5 @@ writer_agent = Agent(
     name="PlanWriterAgent",
     instructions=WRITER_PROMPT,
     model="gpt-5",
-    tools=[WebSearchTool()],
-    output_type=CompletePlan,
+    tools=[]
 )

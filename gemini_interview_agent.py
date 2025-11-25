@@ -3,6 +3,8 @@ from __future__ import annotations
 import asyncio
 import base64
 import webbrowser
+import dateutil.parser
+from datetime import datetime, timedelta
 from typing import Dict, Sequence, Optional
 
 import gradio as gr
@@ -65,131 +67,21 @@ def file_to_base64(file_path: str) -> str:
         return base64.b64encode(f.read()).decode("utf-8")
 
 
-# === Core Agent Tools ===
-@function_tool
-def create_event(name: str, start: EventDateTime, end: EventDateTime) -> str:
+# === Calendar Scheduling Logic ===
+async def schedule_plan_on_calendar(plan: CompletePlan, start_date_val):
     """
-    Create a calendar event in the user's primary Google Calendar.
-    """
-    if not calendar_service:
-        raise ValueError("Google Calendar not authenticated yet.")
-
-    event = {
-        "summary": name,
-        "start": start.model_dump(mode="json"),
-        "end": end.model_dump(mode="json"),
-    }
-    try:
-        calendar_service.events().insert(calendarId="primary", body=event).execute()
-        print(f"[Calendar] Event created: {name}")
-        return f"Successfully created event {name}, start {start.dateTime}, end {end.dateTime}"
-    except Exception as e:
-        print(f"[Calendar] Failed to create event: {e}")
-        return f"Failed to create event {name}, start {start.dateTime}, end {end.dateTime}. Error : {e}"
-
-@function_tool
-def check_schedule(start: EventDateTime, end: EventDateTime) -> str:
-    """
-    Checks the user's calendar to find available timslot
-
-    Include the timezone offset in the time as well
+    Iterates through the plan and schedules events on Google Calendar 
+    using a best-fit algorithm to find free slots.
     """
 
-    # # Fetch events
-    events_result = calendar_service.events().list(
-        calendarId='primary',
-        timeMin=start.dateTime,
-        timeMax=end.dateTime,
-        singleEvents=True,
-        timeZone=start.timeZone,
-        orderBy='startTime'
-    ).execute()
-
-    print("Checked schedule")
-
-    return events_result
-
-
-# === Plan Generation Logic ===
-# async def generate_plan(
-#     cv_file,
-#     job_desc: str,
-#     name: str,
-#     role: str,
-#     goals: str,
-#     time_per_day: int,
-#     E_I: str, S_N: str, T_F: str, J_P: str,
-#     start_date: str,
-#     interview_date: str,
-#     use_calendar: bool,
-#     progress = gr.Progress()
-# ) -> CompletePlan:
-#     # Build system prompt
-#     system_prompt = f"""
-#     Personalized Interview Preparation Plan for:
-#     - Name: {name}
-#     - Role: {role}
-#     - Goals: {goals}
-#     - Daily Time: {time_per_day} hours
-#     - Personality: {E_I}, {S_N}, {T_F}, {J_P}
-#     - Start: {start_date}, Interview: {interview_date}
-#     """
-
-#     job_prompt = f"\nJob Description:\n{job_desc}\n"
-#     full_prompt = system_prompt + job_prompt
-
-#     # Encode CV
-#     cv_base64 = file_to_base64(cv_file.name)
-#     progress.update()
-
-#     # Optional: Trigger OAuth if calendar is requested
-#     if use_calendar and not calendar_service:
-#         auth_url = connect()
-#         webbrowser.open(auth_url)
-        
-#         # Wait for authentication with timeout
-#         max_wait = 60  # seconds
-#         for _ in range(max_wait):
-#             if calendar_service:
-#                 break
-#             await asyncio.sleep(1)
-        
-#         if not calendar_service:
-#             raise ValueError("Calendar authentication timed out. Please try again.")
-
-#     # === Writer Agent with Tools ===
-#     personality_tool = personality_judge_agent.as_tool(
-#         tool_name="personality_analysis",
-#         tool_description="Adapts plan to personality traits",
-#         custom_output_extractor=_summary_extractor
-#     )
-#     feasibility_tool = feasibility_agent.as_tool(
-#         tool_name="feasibility_check",
-#         tool_description="Ensures plan is realistic given time constraints",
-#         custom_output_extractor=_summary_extractor
-#     )
-
-#     tools = [personality_tool, feasibility_tool]
-#     if use_calendar:
-#         tools.extend([create_event,check_schedule])
-
-#     writer_with_tools = writer_agent.clone(tools=tools)
-
-#     # Run writer
-#     result = await Runner.run(
-#         writer_with_tools,
-#         [
-#             {"role": "assistant", "content": full_prompt},
-#             {"role": "user", "content": [{
-#                 "type": "input_file",
-#                 "file_data": f"data:application/pdf;base64,{cv_base64}",
-#                 "filename": cv_file.name,
-#             }]}
-#         ],
-#     )
-#     progress(1.0, desc="✅ Complete!")
-
-#     return result.final_output_as(CompletePlan)
+    start = datetime.fromtimestamp(start_date_val)
+    for day in plan.daily_plans:
+        for task in day.tasks:
+            #find the task for this day to avoid conflicts
+            # then insert tasks in the calendar
+            task.name
+            task.description
+            task.duration
 
 
 def format_plan_for_ui(plan: CompletePlan) -> str:
@@ -225,8 +117,6 @@ async def generate_plan(
     job_prompt = f"\nJob Description:\n{job_desc}\n"
     full_prompt = system_prompt + job_prompt
 
-   # print(full_prompt)
-
     # Encode CV
     progress(0.1, desc="📄 Processing CV...")
     cv_base64 = file_to_base64(cv_file.name)
@@ -254,16 +144,14 @@ async def generate_plan(
     # === Writer Agent with Tools ===
     progress(0.4, desc="🤖 Initializing AI agents...")
     
-    
     feasibility_tool = feasibility_agent.as_tool(
         tool_name="feasibility_check",
         tool_description="Ensures plan is realistic given time constraints",
         custom_output_extractor=_summary_extractor
     )
 
-    tools = [ feasibility_tool]
-    if use_calendar:
-        tools.extend([check_schedule])
+    # NOTE: We REMOVED calendar tools from here to save tokens and stability
+    tools = [feasibility_tool]
 
     writer_with_tools = writer_agent.clone(tools=tools)
 
@@ -281,27 +169,17 @@ async def generate_plan(
             }]}
         ]
     )
-
+    
     plan = result.final_output_as(CompletePlan)
+    progress(0.9, desc="✅ Plan generated!")
 
-    # 2. Post-Processing: Calendar Scheduling (Python Logic)
+    # === Post-Processing: Calendar Schedule ===
     if use_calendar and calendar_service:
-        progress(0.9, desc="📅 Syncing to Google Calendar...")
-        
-        # Use a helper function to find slots based on the plan
-       # await schedule_plan_on_calendar(plan, start_date, time_per_day)
-
-    #return plan
+        progress(0.95, desc="📅 Syncing to Google Calendar...")
+        await schedule_plan_on_calendar(plan, start_date)
     
-    progress(1.0, desc="✅ Plan ready!")
-    
-    return result.final_output_as(CompletePlan)
-
-async def schedule_plan_on_calendar(plan: CompletePlan, start_date, hours_per_day):
-    # Logic to iterate through plan.daily_plans
-    # Logic to find the first available slot in calendar_service
-    # Call calendar_service.events().insert() directly here
-    pass
+    progress(1.0, desc="🎉 All Done!")
+    return plan
 
 
 # === Gradio Interface ===
@@ -400,8 +278,3 @@ if __name__ == "__main__":
     # === Mount Gradio + Run Server ===
     gr.mount_gradio_app(app, demo, path="/")
     uvicorn.run(app, host="localhost", port=8080)
-
-    # Jai limpression que le probleme est possiblment lorsqu il y a trop de jours
-    # il se plante en voulant ecrire
-
-    # Comme anticipe ca fonctionne avec 2 ou 3 jours
