@@ -98,6 +98,29 @@ def parse_markdown_to_plan(markdown_text: str) -> CompletePlan:
 
     return CompletePlan(short_summary=summary, daily_plans=daily_plans)
 
+# In your parse_markdown_to_plan function, return a list of dicts suitable for a DataFrame
+import pandas as pd
+
+def plan_to_dataframe(plan: CompletePlan) -> pd.DataFrame:
+    data = []
+    for day in plan.daily_plans:
+        for task in day.tasks:
+            data.append({
+                "Day": f"Day {day.day}",
+                "Duration": f"{task.duration} mins",
+                "Task": task.name,
+                "Details": task.description
+            })
+    return pd.DataFrame(data)
+
+# In your UI Block
+# Replace the plan_display Markdown with:
+schedule_view = gr.DataFrame(
+    headers=["Day", "Duration", "Task", "Details"], 
+    interactive=False, 
+    wrap=True
+)
+
 
 # ==========================================
 # 🧠 LOGIC 2: Pre-Computation (Speed)
@@ -294,6 +317,7 @@ async def generate_stream(
     # 5. Parse & Post-Processing
     progress(0.8, desc="⚙️ Parsing Plan...")
     plan_object = parse_markdown_to_plan(full_response)
+    dataframe = plan_to_dataframe(plan_object)
     
     # 6. Calendar Sync
     final_status = "✅ Plan Generated Successfully!"
@@ -302,7 +326,7 @@ async def generate_stream(
     
     # Final Yield
     yield (
-        full_response,                  # plan_display
+        dataframe,                  # dataframe
         final_status,                   # status_msg
         gr.update(interactive=True, value="🚀 Generate Plan"),   # Re-enable button
         gr.update(visible=False),       # step_2_col
@@ -364,6 +388,7 @@ with gr.Blocks(title="Interview Agent", css=css) as demo:
         gr.Markdown("## 📝 Your Personalized Plan")
         status_msg = gr.Markdown("")
         plan_display = gr.Markdown("Thinking...")
+        
 
 
     # --- Wiring ---
