@@ -1,67 +1,73 @@
 from pydantic import BaseModel
+from agents import Agent
 
-from agents import Agent, WebSearchTool
+# ==========================================
+# 📝 WRITER AGENT CONFIGURATION
+# ==========================================
 
-# Writer agent brings together the raw search results and optionally calls out
-# to sub‑analyst tools for specialized commentary, then returns a cohesive markdown report.
 WRITER_PROMPT = """
-You are an expert interview preparation plan writer. Your task is to create a comprehensive, extensive,
-detailed plan to prepare a candidate for an upcoming job interview based on 
-the candidate profile, job description and any additional candidate information. 
+You are an expert personalized career coach and curriculum designer. 
+Your goal is to create a highly engaging, gamified learning path for a candidate preparing for a specific job interview.
 
-# Instructions
-1. Create a daily plan that breaks down the preparation into manageable tasks
-2. Make sure to incllude relevent sources, books websites to further research
-3. The task descriptions should be between 10 and 20 words. They should include sources for further reading.
+# CONTEXT
+The candidate needs a structured plan that covers:
+1. Hard Skills (Technical knowledge specific to the role)
+2. Soft Skills (Behavioral questions, culture fit, communication)
+3. Company Research (Understanding the target company)
 
-# Output:
+# INSTRUCTIONS
+1. Analyze the User's Role and Goals deeply.
+2. Create a daily plan where every "Task" is a distinct "Quest".
+3. Keep task descriptions actionable and concise (10-20 words).
+4. ENSURE VARIETY:  Include tasks like "Draft STAR stories", "Research Competitors", "Mock Negotiation", etc.
+
+# OUTPUT FORMAT
 Create a plan in STRICT MARKDOWN format.
 Format every day exactly like this:
-`
+
 # Day 1
-- 60 mins: **Topic Name** - Brief description of the task.
-- 30 mins: **Another Topic** - Brief description.
+- 60 mins: **Quest Title** - Actionable description of the quest.
+- 30 mins: **Quest Title** - Actionable description.
 
 # Day 2
 ...
-`
 """
+
+# ==========================================
+# 🏗️ DATA MODELS
+# ==========================================
 
 class Task(BaseModel):
     name: str
-    """Name of the task to be completed."""
+    """Name of the task/quest (e.g., 'Mastering SQL Joins' or 'STAR Method Practice')."""
 
     description: str
-    """Description of the task to be completed. Should be between 10 and 20 words"""
+    """Actionable description (10-20 words)."""
 
     duration: int
-    """Duration in minutes"""
+    """Duration in minutes."""
 
 class DailyPlan(BaseModel):
     day: int
-    """Day number in the preparation plan."""
+    """Day number in the sequence."""
 
     tasks: list[Task]
-    """List of tasks to be completed on this day."""
-
+    """List of quests for this day."""
 
 class CompletePlan(BaseModel):
     short_summary: str
-    """A short 1 sentence executive summary."""
-
-    # markdown_report: str
-    # """The full markdown report."""
+    """A 1-sentence 'Mission Objective' for the user."""
 
     daily_plans: list[DailyPlan]
-    """A list of daily plans for the interview preparation."""
+    """The full timeline of daily quests."""
 
-
-
-
+# ==========================================
+# 🤖 AGENT DEFINITION
+# ==========================================
 
 writer_agent = Agent(
     name="PlanWriterAgent",
     instructions=WRITER_PROMPT,
-    model="gpt-5",
+    model="gpt-4o", # Updated to fast/high-quality model
     tools=[]
 )

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import random
 import re
 import webbrowser
 import time
@@ -137,17 +138,29 @@ def init_game_state(plan: CompletePlan) -> List[Dict]:
     """Transforms the static 'CompletePlan' into an interactive 'Game State'."""
     game_tasks = []
     task_id = 0
+    difficulties = ["Normal", "Hard", "Hardest"]
     
     for day in plan.daily_plans:
         for task in day.tasks:
+            is_boss = "mock" in task.name.lower()
+            difficulty = "Hardest" if is_boss else random.choice(difficulties)
+            
+            # XP Calculation
+            base_xp = {"Normal": 50, "Hard": 100, "Hardest": 150}[difficulty]
+            duration_xp = task.duration // 2
+            xp = base_xp + duration_xp
+            if is_boss:
+                xp *= 1.5  # 50% multiplier for bosses
+
             game_tasks.append({
                 "id": task_id,
                 "day": f"Day {day.day}",
                 "name": task.name,
                 "desc": task.description,
                 "status": "🔓 UNLOCKED" if task_id == 0 else "🔒 LOCKED", 
-                "xp_reward": 100 + (task.duration // 2), 
-                "type": "BOSS BATTLE" if "mock" in task.name.lower() else "QUEST"
+                "xp_reward": int(xp), 
+                "type": "BOSS BATTLE" if is_boss else "QUEST",
+                "difficulty": difficulty
             })
             task_id += 1
             
@@ -195,14 +208,23 @@ def calculate_player_stats(game_tasks: List[Dict]):
 # 🧠 MODULE 2: AI QUIZ ENGINE
 # ============================================================
 
-def generate_quiz_for_task(role: str, task_name: str, task_desc: str) -> List[Dict]:
-    """Generates 3 multiple-choice questions dynamically."""
+def generate_quiz_for_task(role: str, task_name: str, task_desc: str, difficulty: str) -> List[Dict]:
+    """Generates 3-6 multiple-choice questions dynamically based on difficulty."""
+    num_questions = random.randint(3, 6)
+    
+    difficulty_instructions = {
+        "Normal": "The questions should be challenging, simulating a real interview question for the role.",
+        "Hard": "The questions should be particularly tough, focusing on non-obvious aspects, edge cases, or requiring deep, specific knowledge.",
+        "Hardest": "The questions should be exceptionally difficult, suitable for a senior or leadership position in the field. They might involve complex problem-solving, strategic thinking, or deep domain expertise."
+    }
+
     prompt = f"""
     CONTEXT: User is preparing for a '{role}' role.
     CURRENT QUEST: "{task_name}" - {task_desc}
+    DIFFICULTY: {difficulty} - {difficulty_instructions.get(difficulty, "")}
 
     INSTRUCTIONS:
-    Generate 3 distinct multiple-choice questions to test the user's understanding of this specific quest.
+    Generate {num_questions} distinct multiple-choice questions to test the user's understanding of this specific quest.
     
     OUTPUT:
     Return strictly a JSON object with this structure:
@@ -236,7 +258,7 @@ def generate_quiz_for_task(role: str, task_name: str, task_desc: str) -> List[Di
     except Exception as e:
         print(f"Quiz Error: {e}")
         # Fallback
-        return [{"q": "Confirm you completed this task?", "options": ["Yes", "No"], "correct_index": 0}] * 3
+        return [{"q": "Confirm you completed this task?", "options": ["Yes", "No"], "correct_index": 0}] * num_questions
 
 # ============================================================
 # 📝 MODULE 3: PLAN PARSING
@@ -432,6 +454,9 @@ with gr.Blocks(title="Career Quest", css=css) as demo:
             q1_comp = gr.Radio(label="Q1")
             q2_comp = gr.Radio(label="Q2")
             q3_comp = gr.Radio(label="Q3")
+            q4_comp = gr.Radio(label="Q4", visible=False)
+            q5_comp = gr.Radio(label="Q5", visible=False)
+            q6_comp = gr.Radio(label="Q6", visible=False)
             submit_quiz_btn = gr.Button("Submit Answers", variant="primary")
             feedback_box = gr.Markdown(elem_classes="feedback")
 
@@ -458,63 +483,70 @@ with gr.Blocks(title="Career Quest", css=css) as demo:
             return {quiz_modal: gr.update(visible=False), board_feedback: "✅ Quest already completed!"}
 
         # Generate Quiz
-        quiz_questions = generate_quiz_for_task(role, task['name'], task['desc'])
+        quiz_questions = generate_quiz_for_task(role, task['name'], task['desc'], task['difficulty'])
         
-        # Ensure we have 3 questions (fallback handling)
-        while len(quiz_questions) < 3:
-            quiz_questions.append({"q": "Bonus Check: Ready?", "options": ["Yes"], "correct_index": 0})
+        num_questions = len(quiz_questions)
 
         # Debug Print
-        print(f"Generated Quiz for {task['name']}")
+        print(f"Generated {num_questions} Quiz for {task['name']} (Difficulty: {task['difficulty']})")
         for q in quiz_questions:
             print(f"Q: {q['q']} | Ans: {q['options'][q['correct_index']]}")
 
-        return {
+        updates = {
             board_container: gr.update(visible=False),
             quiz_modal: gr.update(visible=True),
             active_task_idx: row_idx,
             active_quiz_data: quiz_questions,
             q_header: gr.update(value=f"### ⚔️ Quest: {task['name']}"),
-            q1_comp: gr.Radio(choices=quiz_questions[0]['options'], label=quiz_questions[0]['q'], value=None),
-            q2_comp: gr.Radio(choices=quiz_questions[1]['options'], label=quiz_questions[1]['q'], value=None),
-            q3_comp: gr.Radio(choices=quiz_questions[2]['options'], label=quiz_questions[2]['q'], value=None),
             feedback_box: gr.update(value="")
         }
+        
+        # Dynamically update question components
+        all_q_comps = [q1_comp, q2_comp, q3_comp, q4_comp, q5_comp, q6_comp]
+        for i, q_comp in enumerate(all_q_comps):
+            if i < num_questions:
+                updates[q_comp] = gr.update(
+                    label=quiz_questions[i]['q'],
+                    choices=quiz_questions[i]['options'],
+                    value=None,
+                    visible=True
+                )
+            else:
+                updates[q_comp] = gr.update(visible=False, value=None)
 
-    def submit_quiz_answers(idx, a1, a2, a3, quiz_data, game_tasks):
+        return updates
+
+    def submit_quiz_answers(idx, a1, a2, a3, a4, a5, a6, quiz_data, game_tasks):
         if idx == -1 or not game_tasks:
             return {feedback_box: "⚠️ Error: No active quest."}
 
+        num_questions = len(quiz_data)
+        user_answers = [a1, a2, a3, a4, a5, a6]
+        
         # Debug Inputs
-        print(f"Submit Answers: {a1}, {a2}, {a3}")
-        
-        # Validation Logic: Compare User Selection to Option at Correct Index
+        print(f"Submit Answers: {user_answers[:num_questions]}")
+
+        # Validation Logic
         score = 0
-        user_answers = [a1, a2, a3]
-        
         for i, question in enumerate(quiz_data):
-            if i >= 3: break # Safety
-            
             correct_idx = question.get('correct_index', 0)
             options = question.get('options', [])
             
-            # Get the correct string
             if 0 <= correct_idx < len(options):
                 correct_string = options[correct_idx]
-                
-                # Check match (Robust comparison)
                 user_ans = user_answers[i]
                 if user_ans and user_ans.strip() == correct_string.strip():
                     score += 1
                 else:
-                    print(f"Wrong: User '{user_ans}' vs Correct '{correct_string}'")
+                    print(f"Wrong Answer for Q{i+1}: User '{user_ans}' vs Correct '{correct_string}'")
             else:
                 print(f"Error: Index {correct_idx} out of bounds for options {options}")
 
-        # Fail Condition
-        if score < 2:
+        # Fail Condition (needs 2/3 majority to pass)
+        pass_threshold = -(-num_questions * 2 // 3) # Ceiling division
+        if score < pass_threshold:
             return {
-                feedback_box: f"❌ {score}/3 Correct. You need 2/3 to pass. Check the console logs for answers if stuck!",
+                feedback_box: f"❌ {score}/{num_questions} Correct. You need {pass_threshold} to pass. Try again!",
                 board_container: gr.update(visible=False),
                 quiz_modal: gr.update(visible=True),
                 game_state_store: game_tasks,
@@ -551,12 +583,12 @@ with gr.Blocks(title="Career Quest", css=css) as demo:
     quest_board.select(
         fn=on_quest_click,
         inputs=[game_state_store, role_input],
-        outputs=[board_container, quiz_modal, active_task_idx, active_quiz_data, q_header, q1_comp, q2_comp, q3_comp, feedback_box, board_feedback]
+        outputs=[board_container, quiz_modal, active_task_idx, active_quiz_data, q_header, q1_comp, q2_comp, q3_comp, q4_comp, q5_comp, q6_comp, feedback_box, board_feedback]
     )
 
     submit_quiz_btn.click(
         fn=submit_quiz_answers,
-        inputs=[active_task_idx, q1_comp, q2_comp, q3_comp, active_quiz_data, game_state_store],
+        inputs=[active_task_idx, q1_comp, q2_comp, q3_comp, q4_comp, q5_comp, q6_comp, active_quiz_data, game_state_store],
         outputs=[feedback_box, board_container, quiz_modal, game_state_store, quest_board, stats_display, board_feedback]
     )
 
