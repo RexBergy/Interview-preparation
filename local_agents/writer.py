@@ -19,7 +19,7 @@ The candidate needs a structured plan that covers:
 1. Analyze the User's Role and Goals deeply.
 2. Create a daily plan where every "Task" is a distinct "Quest".
 3. Keep task descriptions actionable and concise (10-20 words).
-4. ENSURE VARIETY:  Include tasks like "Draft STAR stories", "Research Competitors", "Mock Negotiation", etc.
+4. ENSURE VARIETY:  Include a great variety of tasks depending on the context
 
 # OUTPUT FORMAT
 Create a plan in STRICT MARKDOWN format.

@@ -65,12 +65,17 @@ def render_quest_board(game_tasks: List[Dict]) -> pd.DataFrame:
     )
 
 def calculate_player_stats(game_tasks: List[Dict]):
-    """Calculates total XP and Level."""
+    """Calculates total XP, Level, and progress towards next level."""
     if not game_tasks:
-        return 0, 1, "Novice"
+        return 0, 1, "Novice", 0, 500
         
     current_xp = sum(t['xp_reward'] for t in game_tasks if t['status'] == "COMPLETED")
-    level = 1 + (current_xp // 500)
-    titles = ["Novice", "Apprentice", "Journeyman", "Expert", "Master", "Grandmaster"]
+    
+    xp_per_level = 500
+    level = 1 + (current_xp // xp_per_level)
+    xp_in_level = current_xp % xp_per_level
+    
+    titles = ["Novice", "Apprentice", "Journeyman", "Expert", "Master", "Grandmaster", "Legend"]
     title = titles[min(level-1, len(titles)-1)]
-    return current_xp, level, title
+    
+    return current_xp, level, title, xp_in_level, xp_per_level
