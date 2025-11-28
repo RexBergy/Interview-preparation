@@ -28,7 +28,7 @@ def init_game_state(plan: CompletePlan) -> List[Dict]:
                 "day": f"Day {day.day}",
                 "name": task.name,
                 "desc": task.description,
-                "status": "🔓 UNLOCKED" if task_id == 0 else "🔒 LOCKED", 
+                "status": "🔐 UNLOCKED" if task_id == 0 else "🔒 LOCKED", 
                 "xp_reward": int(xp), 
                 "type": "BOSS BATTLE" if is_boss else "QUEST",
                 "difficulty": difficulty

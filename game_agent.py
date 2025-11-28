@@ -32,7 +32,7 @@ app = FastAPI()
 # ⚡ MODULE 4: GENERATION LOGIC (Global)
 # ============================================================
 
-async def stream_plan_generation(role, goal, hours, start_date_ts, interview_date_ts, use_cal, pref_time, progress=gr.Progress()):
+async def stream_plan_generation(role, goal, job_description, hours, start_date_ts, interview_date_ts, use_cal, pref_time, progress=gr.Progress()):
     """Generates the plan, syncs to Calendar, and initializes Game."""
     
     # 1. Validation & Setup
@@ -81,10 +81,13 @@ async def stream_plan_generation(role, goal, hours, start_date_ts, interview_dat
     CONTEXT:
     - Candidate Role: {role}
     - Goals: {goal}
+    - Job Description: {job_description if job_description else "Not provided."}
     - Logistics: {days_avail} days available, {hours} hours/day.
     
     INSTRUCTIONS:
-    Write a gamified preparation plan. Create quests specific to {role}.
+    Write a gamified preparation plan. Create quests specific to the role of {role}. 
+    If a job description is provided, tailor the quests to the requirements and responsibilities listed. 
+    The quests should cover both general skills for the role and specific points from the job description.
     Format carefully as requested.
     """
 
@@ -207,6 +210,7 @@ with gr.Blocks(title="Career Quest", theme=MedievalFantasy(), css=css) as demo:
             hours_input = gr.Slider(1, 10, value=2, label="Hours per Day")
         
         goal_input = gr.Textbox(label="Main Quest Goal", placeholder="e.g. Land a senior role")
+        job_description_input = gr.Textbox(label="Job Description (Optional)", placeholder="Paste the job description here to tailor your quests.")
         
         with gr.Row():
             start_date = gr.DateTime(label="Start Date")
@@ -248,13 +252,15 @@ with gr.Blocks(title="Career Quest", theme=MedievalFantasy(), css=css) as demo:
         with gr.Group(visible=False) as quiz_modal:
             gr.Markdown("## 🧠 Knowledge Check")
             q_header = gr.Markdown("Loading...")
-            q1_comp = gr.Radio(label="Q1")
-            q2_comp = gr.Radio(label="Q2")
-            q3_comp = gr.Radio(label="Q3")
-            q4_comp = gr.Radio(label="Q4", visible=False)
-            q5_comp = gr.Radio(label="Q5", visible=False)
-            q6_comp = gr.Radio(label="Q6", visible=False)
-            submit_quiz_btn = gr.Button("Submit Answers", variant="primary")
+            quiz_loading_msg = gr.Markdown("### 🧙‍♂️ Forging your questions...", visible=False)
+            with gr.Group(visible=True) as quiz_questions_group:
+                q1_comp = gr.Radio(label="Q1")
+                q2_comp = gr.Radio(label="Q2")
+                q3_comp = gr.Radio(label="Q3")
+                q4_comp = gr.Radio(label="Q4", visible=False)
+                q5_comp = gr.Radio(label="Q5", visible=False)
+                q6_comp = gr.Radio(label="Q6", visible=False)
+                submit_quiz_btn = gr.Button("Submit Answers", variant="primary")
             feedback_box = gr.Markdown(elem_classes="feedback")
 
     # ============================================================
@@ -303,18 +309,27 @@ with gr.Blocks(title="Career Quest", theme=MedievalFantasy(), css=css) as demo:
     def start_quiz(row_idx, game_tasks, role):
         """Generates and displays the quiz for the active task."""
         if row_idx == -1 or not game_tasks:
-            return {board_feedback: "⚠️ Error: No active quest."}
+            raise gr.Error("No active quest selected.")
 
+        # Show loading state
+        yield {
+            quest_details_col: gr.update(visible=False),
+            quiz_modal: gr.update(visible=True),
+            quiz_loading_msg: gr.update(visible=True),
+            quiz_questions_group: gr.update(visible=False),
+            feedback_box: ""
+        }
+        
         task = game_tasks[row_idx]
+        
         quiz_questions = generate_quiz_for_task(role, task['name'], task['desc'], task['difficulty'])
         num_questions = len(quiz_questions)
 
         updates = {
-            quest_details_col: gr.update(visible=False),
-            quiz_modal: gr.update(visible=True),
+            quiz_loading_msg: gr.update(visible=False),
+            quiz_questions_group: gr.update(visible=True),
             active_quiz_data: quiz_questions,
-            q_header: gr.update(value=f"### ⚔️ Quest: {task['name']}"),
-            feedback_box: gr.update(value="")
+            q_header: gr.update(value=f"### ⚔️ Quest: {task['name']}")
         }
         
         all_q_comps = [q1_comp, q2_comp, q3_comp, q4_comp, q5_comp, q6_comp]
@@ -328,7 +343,8 @@ with gr.Blocks(title="Career Quest", theme=MedievalFantasy(), css=css) as demo:
                 )
             else:
                 updates[q_comp] = gr.update(visible=False, value=None)
-        return updates
+        
+        yield updates
 
     def get_help(row_idx, game_tasks):
         """Displays help information for the selected quest."""
@@ -413,7 +429,7 @@ with gr.Blocks(title="Career Quest", theme=MedievalFantasy(), css=css) as demo:
     # --- WIRING ---
     generate_btn.click(
         fn=stream_plan_generation,
-        inputs=[role_input, goal_input, hours_input, start_date, interview_date, use_cal, pref_time],
+        inputs=[role_input, goal_input, job_description_input, hours_input, start_date, interview_date, use_cal, pref_time],
         outputs=[raw_stream_output, step_1_col, step_2_col, game_state_store, quest_board, stats_display, loading_msg, board_container]
     )
 
@@ -426,7 +442,11 @@ with gr.Blocks(title="Career Quest", theme=MedievalFantasy(), css=css) as demo:
     start_quiz_btn.click(
         fn=start_quiz,
         inputs=[active_task_idx, game_state_store, role_input],
-        outputs=[quest_details_col, quiz_modal, active_quiz_data, q_header, feedback_box, q1_comp, q2_comp, q3_comp, q4_comp, q5_comp, q6_comp]
+        outputs=[
+            quest_details_col, quiz_modal, active_quiz_data, q_header, feedback_box, 
+            q1_comp, q2_comp, q3_comp, q4_comp, q5_comp, q6_comp,
+            quiz_loading_msg, quiz_questions_group
+        ]
     )
 
     get_help_btn.click(
