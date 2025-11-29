@@ -4,7 +4,6 @@
  * @file Main entry point for the Interview Quest frontend application.
  * This script orchestrates the entire application flow, wiring up UI elements,
  * handling user interactions, and coordinating with the API and UI modules.
- * @author Gemini
  */
 
 import {
@@ -116,6 +115,10 @@ document.addEventListener('DOMContentLoaded', () => {
         alert(error.message);
         closeQuizModal();
       }
+    } else if (e.target.classList.contains('learn-more-btn')) {
+      const quest = e.target.dataset.quest;
+      const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(quest)}`;
+      window.open(searchUrl, '_blank');
     }
   });
 

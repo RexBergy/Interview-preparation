@@ -9,13 +9,11 @@ the API routers for different functionalities like game logic and calendar integ
 """
 
 import os
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 
-from backend.dependencies import get_game_manager
 from backend.routers import game_router, calendar_router
-from backend.game_manager import GameManager
 
 # When running locally, disable OAuthlib's HTTPS verification for development purposes.
 # This should not be used in a production environment.

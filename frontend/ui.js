@@ -3,7 +3,6 @@
 /**
  * @file Manages all DOM manipulations, UI updates, and visual interactions for the Interview Quest application.
  * This module centralizes control over the user interface, from populating forms to rendering dynamic content like game boards and modals.
- * @author Gemini
  */
 
 import { getGameState } from './api.js';
@@ -181,6 +180,11 @@ function renderQuestBoard(board) {
             <td>
                 <button data-index="${index}" data-status="${task.Status}" ${!isClickable ? 'disabled' : ''}>
                     ${task.Status === '✅ DONE' ? 'Completed' : 'Start'}
+                </button>
+            </td>
+            <td>
+                <button class="learn-more-btn" data-quest="${task['Quest Objective']}" title="Learn More">
+                    ❓
                 </button>
             </td>
         `;

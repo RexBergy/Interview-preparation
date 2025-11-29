@@ -4,7 +4,6 @@
  * @file Manages the client-side state for the Interview Quest application.
  * This module provides a simple, centralized object to hold application-wide data
  * that needs to be accessed by different modules.
- * @author Gemini
  */
 
 /**
