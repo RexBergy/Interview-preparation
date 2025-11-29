@@ -1,302 +1,199 @@
+// frontend/script.js
+
+/**
+ * @file Main entry point for the Interview Quest frontend application.
+ * This script orchestrates the entire application flow, wiring up UI elements,
+ * handling user interactions, and coordinating with the API and UI modules.
+ * @author Gemini
+ */
+
+import {
+  connectCalendar,
+  generatePlan,
+  startQuiz,
+  submitQuiz,
+} from './api.js';
+import {
+  DOM,
+  setMinDates,
+  populateTimeSelect,
+  populateHoursSelect,
+  showStep,
+  updatePlanStream,
+  updateLoadingStatus,
+  loadAndRenderGameBoard,
+  openQuizModal,
+  closeQuizModal,
+  displayQuizResult,
+  showQuizLoading,
+} from './ui.js';
+import { appState } from './state.js';
+
+/**
+ * Main application logic, executed once the DOM is fully loaded.
+ * It initializes the UI and sets up all necessary event listeners.
+ */
 document.addEventListener('DOMContentLoaded', () => {
-    // --- DOM ELEMENTS ---
-    const setupStep = document.getElementById('setup-step');
-    const loadingStep = document.getElementById('loading-step');
-    const gameBoardStep = document.getElementById('game-board-step');
-    const setupForm = document.getElementById('setup-form');
-    const useCalCheckbox = document.getElementById('use_cal');
-    const connectCalBtn = document.getElementById('connect-cal-btn');
-    const planStreamEl = document.getElementById('plan-stream');
-    const loadingStatusEl = document.getElementById('loading-status');
-    const questBoardBody = document.querySelector('#quest-board-table tbody');
-    const playerStatsEl = document.getElementById('player-stats');
-    const quizModal = document.getElementById('quiz-modal');
-    const quizForm = document.getElementById('quiz-form');
-    const quizTitle = document.getElementById('quiz-title');
-    const quizQuestionsContainer = document.getElementById('quiz-questions-container');
-    const quizResultEl = document.getElementById('quiz-result');
-    const closeQuizBtn = document.getElementById('close-quiz-btn');
-    const gameOverModal = document.getElementById('game-over-modal');
+  // --- INITIAL UI SETUP ---
+  // Configure form elements with default and valid values.
+  setMinDates();
+  populateTimeSelect();
+  populateHoursSelect();
 
-    let roleForQuiz = '';
+  // --- EVENT LISTENERS ---
 
-    // --- INITIAL SETUP ---
-    function setMinDates() {
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('start_date').setAttribute('min', today);
-        document.getElementById('start_date').value = today;
-        document.getElementById('interview_date').setAttribute('min', today);
+  /**
+   * Toggles the "Connect" button's disabled state based on whether the
+   * "Sync with Google Calendar" checkbox is checked.
+   */
+  DOM.useCalCheckbox.addEventListener('change', () => {
+    DOM.connectCalBtn.disabled = !DOM.useCalCheckbox.checked;
+  });
+
+  /**
+   * Handles the Google Calendar connection flow.
+   * On click, it calls the API to get an auth URL, opens it in a new tab,
+   * and updates the button state upon success.
+   */
+  DOM.connectCalBtn.addEventListener('click', async () => {
+    try {
+      const data = await connectCalendar();
+      if (data.auth_url) {
+        window.open(data.auth_url, '_blank');
+        DOM.connectCalBtn.textContent = 'Connected!';
+        DOM.connectCalBtn.disabled = true;
+      }
+    } catch (error) {
+      alert(error.message); // Display friendly error to the user.
     }
+  });
 
-    function populateTimeSelect() {
-        const select = document.getElementById('pref_time');
-        for (let i = 7; i <= 21; i++) {
-            const option = document.createElement('option');
-            option.value = i;
-            option.textContent = `${i}:00 (${i < 12 ? i + ' AM' : (i === 12 ? '12 PM' : i - 12 + ' PM')})`;
-            if (i === 9) option.selected = true;
-            select.appendChild(option);
+  /**
+   * Handles the main setup form submission.
+   * It gathers user input, stores the role in the app state, switches to the loading view,
+   * and initiates the plan generation process.
+   */
+  DOM.setupForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(DOM.setupForm);
+    const data = Object.fromEntries(formData.entries());
+    data.use_cal = DOM.useCalCheckbox.checked;
+    appState.roleForQuiz = data.role; // Cache role for later use in quizzes.
+
+    showStep('loading');
+    updatePlanStream(''); // Clear any previous plan text.
+
+    try {
+      const response = await generatePlan(data);
+      await processPlanStream(response); // Handle the streaming response.
+    } catch (error) {
+      alert(error.message);
+      showStep('setup'); // On failure, return to the setup screen.
+    }
+  });
+
+  /**
+   * Uses event delegation to handle clicks on "Start" buttons within the quest board.
+   * It identifies the clicked quest and initiates the quiz if the quest is active.
+   */
+  DOM.questBoardBody.addEventListener('click', async (e) => {
+    // Ensure the click is on a button with a task index.
+    if (e.target.tagName === 'BUTTON' && e.target.dataset.index) {
+      const taskIndex = parseInt(e.target.dataset.index, 10);
+      const taskStatus = e.target.dataset.status;
+
+      // Prevent starting locked or completed quests.
+      if (taskStatus === '🔒 LOCKED' || taskStatus === '✅ DONE') {
+        alert(`Quest is ${taskStatus === '✅ DONE' ? 'already completed' : 'locked'}.`);
+        return;
+      }
+      
+      try {
+        openQuizModal(); // Show loading state
+        const quizData = await startQuiz(taskIndex, appState.roleForQuiz);
+        openQuizModal(quizData); // Populate with data
+      } catch (error) {
+        alert(error.message);
+        closeQuizModal();
+      }
+    }
+  });
+
+  /**
+   * Handles the submission of the quiz form.
+   * It collects all selected answers and sends them to the server for evaluation.
+   */
+  DOM.quizForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(DOM.quizForm);
+    const answers = Array.from(formData.values());
+    
+    try {
+      const result = await submitQuiz(answers);
+      displayQuizResult(result); // Show the outcome to the user.
+    } catch (error) {
+      alert(error.message);
+    }
+  });
+
+  /**
+   * Handles closing the quiz modal. After closing, it re-fetches and renders
+   * the game board to reflect any state changes (e.g., quest completion, life loss).
+   */
+  DOM.closeQuizBtn.addEventListener('click', async () => {
+    closeQuizModal();
+    await loadAndRenderGameBoard();
+  });
+
+  /**
+   * Handles the "Restart" button in the game over modal, simply reloading the page
+   * to start a fresh session.
+   */
+  DOM.restartGameBtn.addEventListener('click', () => {
+    window.location.reload();
+  });
+
+  // --- HELPER FUNCTIONS ---
+
+  /**
+   * Processes the Server-Sent Events (SSE) stream from the plan generation endpoint.
+   * It reads chunks of data, parses them, and updates the UI accordingly.
+   * @param {Response} response - The raw Response object from the `fetch` call.
+   */
+  async function processPlanStream(response) {
+    const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
+    
+    while (true) {
+        const { value, done } = await reader.read();
+        if (done) {
+            // Once the stream is finished, load the main game board.
+            updateLoadingStatus('Loading game board...');
+            await loadAndRenderGameBoard();
+            showStep('game-board');
+            break;
         }
-    }
 
-    function populateHoursSelect() {
-        const select = document.getElementById('hours');
-        const values = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 4, 5, 6, 8];
+        // SSE messages are often separated by double newlines.
+        const lines = value.split('\n\n').filter(line => line.trim());
+        for (const line of lines) {
+            const [eventLine, dataLine] = line.split('\n');
+            if (!eventLine || !dataLine) continue;
 
-        values.forEach(value => {
-            const option = document.createElement('option');
-            option.value = value;
+            const eventType = eventLine.replace('event: ', '');
+            const eventData = dataLine.replace('data: ', '');
 
-            let text = '';
-            if (value < 1) {
-                text = `${value * 60} min`;
-            } else {
-                const hours = Math.floor(value);
-                const minutes = (value % 1) * 60;
-                text = `${hours}h`;
-                if (minutes > 0) {
-                    text += ` ${minutes} min`;
+            try {
+                const parsedData = JSON.parse(eventData);
+                // Update UI based on the event type sent from the server.
+                if (eventType === 'plan_chunk') {
+                    updatePlanStream(parsedData);
+                } else if (eventType === 'status') {
+                    updateLoadingStatus(parsedData);
                 }
+            } catch (e) {
+                console.error("Failed to parse SSE data chunk:", eventData);
             }
-            option.textContent = text;
-
-            if (value === 2) {
-                option.selected = true;
-            }
-            select.appendChild(option);
-        });
-    }
-
-    setMinDates();
-    populateTimeSelect();
-    populateHoursSelect();
-
-    // --- EVENT LISTENERS ---
-    useCalCheckbox.addEventListener('change', () => {
-        connectCalBtn.disabled = !useCalCheckbox.checked;
-    });
-
-    connectCalBtn.addEventListener('click', async () => {
-        try {
-            const response = await fetch('/connect_calendar');
-            const data = await response.json();
-            if (data.auth_url) {
-                window.open(data.auth_url, '_blank');
-                connectCalBtn.textContent = 'Connected!';
-                connectCalBtn.disabled = true;
-            }
-        } catch (error) {
-            console.error('Error connecting to calendar:', error);
-            alert('Could not connect to Google Calendar.');
-        }
-    });
-
-    setupForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const formData = new FormData(setupForm);
-        const data = Object.fromEntries(formData.entries());
-        data.use_cal = useCalCheckbox.checked;
-        roleForQuiz = data.role;
-
-        setupStep.classList.add('hidden');
-        loadingStep.classList.remove('hidden');
-
-        planStreamEl.textContent = '';
-
-        // Use fetch for POST request with streaming response
-        const response = await fetch('/generate_plan', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
-
-        if (!response.body) {
-            loadingStatusEl.textContent = 'Error: Response body is not available.';
-            return;
-        }
-
-        const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
-        
-        while (true) {
-            const { value, done } = await reader.read();
-            if (done) {
-                loadingStatusEl.textContent = 'Loading game board...';
-                await loadGameBoard();
-                loadingStep.classList.add('hidden');
-                gameBoardStep.classList.remove('hidden');
-                break;
-            }
-
-            // Process SSE chunks
-            const lines = value.split('\n\n').filter(line => line.trim());
-            for (const line of lines) {
-                const [eventLine, dataLine] = line.split('\n');
-                if (!eventLine || !dataLine) continue;
-
-                const eventType = eventLine.replace('event: ', '');
-                const eventData = dataLine.replace('data: ', '');
-
-                try {
-                    const parsedData = JSON.parse(eventData);
-                    if (eventType === 'plan_chunk') {
-                        planStreamEl.textContent += parsedData;
-                        planStreamEl.scrollTop = planStreamEl.scrollHeight;
-                    } else if (eventType === 'status') {
-                        loadingStatusEl.textContent = parsedData;
-                    } else if (eventType === 'complete') {
-                        // The 'done' condition of the reader will handle this.
-                    }
-                } catch (e) {
-                    console.error("Failed to parse SSE data:", eventData);
-                }
-            }
-        }
-    });
-
-    questBoardBody.addEventListener('click', async (e) => {
-        if (e.target.tagName === 'BUTTON' && e.target.dataset.index) {
-            const taskIndex = parseInt(e.target.dataset.index, 10);
-            const taskStatus = e.target.dataset.status;
-
-            if (taskStatus === '🔒 LOCKED' || taskStatus === '✅ DONE') {
-                alert(`Quest is ${taskStatus === '✅ DONE' ? 'already completed' : 'locked'}.`);
-                return;
-            }
-            
-            openQuizModal(taskIndex);
-        }
-    });
-
-    quizForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const formData = new FormData(quizForm);
-        const answers = Array.from(formData.values());
-        
-        const response = await fetch('/quiz/submit', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ answers })
-        });
-        const result = await response.json();
-        
-        displayQuizResult(result);
-    });
-
-    closeQuizBtn.addEventListener('click', async () => {
-        quizModal.classList.add('hidden');
-        await loadGameBoard();
-    });
-
-    document.getElementById('restart-game-btn').addEventListener('click', () => {
-        window.location.reload();
-    });
-
-    // --- RENDER FUNCTIONS ---
-    async function loadGameBoard() {
-        try {
-            const response = await fetch('/game_state');
-            if (!response.ok) throw new Error('Failed to load game state');
-            const state = await response.json();
-            renderPlayerStats(state.stats);
-            renderQuestBoard(state.board);
-        } catch (error) {
-            console.error(error);
-            alert('Could not load game board. Please try generating a new plan.');
         }
     }
-
-    function renderPlayerStats(stats) {
-        const progressPercent = stats.xp_per_level > 0 ? (stats.xp_in_level / stats.xp_per_level) * 100 : 0;
-        playerStatsEl.innerHTML = `
-            <h3>Level ${stats.level} ${stats.title}</h3>
-            <div class="progress-bar-container">
-                <div class="progress-bar" style="width: ${progressPercent}%">${stats.xp_in_level} / ${stats.xp_per_level} XP</div>
-            </div>
-            <p>Lives: ${'❤️'.repeat(stats.lives)} | Total XP: ✨ ${stats.xp}</p>
-        `;
-    }
-
-    function renderQuestBoard(board) {
-        questBoardBody.innerHTML = '';
-        board.forEach((task, index) => {
-            const row = document.createElement('tr');
-            const isClickable = task.Status !== '🔒 LOCKED' && task.Status !== '✅ DONE';
-            row.innerHTML = `
-                <td>${task.Status}</td>
-                <td>${task.Timeline}</td>
-                <td>${task['Quest Objective']}</td>
-                <td>${task.Rewards}</td>
-                <td>
-                    <button data-index="${index}" data-status="${task.Status}" ${!isClickable ? 'disabled' : ''}>
-                        ${task.Status === '✅ DONE' ? 'Completed' : 'Start'}
-                    </button>
-                </td>
-            `;
-            questBoardBody.appendChild(row);
-        });
-    }
-
-    async function openQuizModal(taskIndex) {
-        try {
-            const response = await fetch('/start_quiz', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ task_index: taskIndex, role: roleForQuiz })
-            });
-            if (!response.ok) throw new Error('Failed to load quiz');
-            const data = await response.json();
-
-            quizTitle.textContent = `⚔️ Quest: ${data.task_name}`;
-            quizQuestionsContainer.innerHTML = '';
-            data.questions.forEach((q, i) => {
-                const questionDiv = document.createElement('div');
-                questionDiv.className = 'quiz-question';
-                let optionsHtml = q.options.map((opt, j) => `
-                    <label>
-                        <input type="radio" name="q${i}" value="${opt}" required>
-                        ${opt}
-                    </label>
-                `).join('');
-                questionDiv.innerHTML = `
-                    <p>${i + 1}. ${q.q}</p>
-                    <div class="quiz-options">${optionsHtml}</div>
-                `;
-                quizQuestionsContainer.appendChild(questionDiv);
-            });
-
-            quizResultEl.classList.add('hidden');
-            closeQuizBtn.classList.add('hidden');
-            quizForm.classList.remove('hidden');
-            quizModal.classList.remove('hidden');
-
-        } catch (error) {
-            console.error(error);
-            alert('Could not start the quiz for this quest.');
-        }
-    }
-
-    function displayQuizResult(result) {
-        quizForm.classList.add('hidden');
-        quizResultEl.classList.remove('hidden');
-        closeQuizBtn.classList.remove('hidden');
-
-        let message = '';
-        if (result.passed) {
-            quizResultEl.className = 'result-success';
-            message = `<h3>🎉 Victory! Quest Complete! 🎉</h3>
-                       <p>Score: ${result.score}/${result.total}</p>`;
-        } else {
-            quizResultEl.className = 'result-fail';
-            if (result.game_over) {
-                quizModal.classList.add('hidden');
-                gameOverModal.classList.remove('hidden');
-                return;
-            }
-            message = `<h3>Incorrect</h3>
-                       <p>Score: ${result.score}/${result.total}. You lost a life!</p>
-                       <p>You have ${result.lives_left} ${result.lives_left > 1 ? 'lives' : 'life'} left. Try again!</p>`;
-            // Allow retrying by just closing the modal
-        }
-        quizResultEl.innerHTML = message;
-    }
+  }
 });

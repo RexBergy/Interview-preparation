@@ -19,6 +19,10 @@
     padding: 0;
 }
 
+html, body {
+    height: 100%; /* Ensure full height for vh calculations */
+}
+
 body {
     font-family: var(--font-body);
     background-color: var(--background-color);
@@ -172,12 +176,30 @@ button:disabled {
     text-align: center;
 }
 .progress-bar-container {
-    width: 100%; background-color: #444; border-radius: 5px; margin: 0.5rem 0;
+    width: 100%;
+    background-color: #444;
+    border-radius: 5px;
+    margin: 0.5rem 0;
+    position: relative; /* Needed for absolute positioning of the text */
 }
 .progress-bar {
-    height: 24px; background-color: var(--primary-color); border-radius: 5px;
-    text-align: center; color: var(--background-color); line-height: 24px;
+    height: 24px;
+    background-color: var(--primary-color);
+    border-radius: 5px;
     transition: width 0.5s ease-in-out;
+}
+.progress-bar-text {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    line-height: 24px; /* Match height for vertical alignment */
+    font-weight: bold;
 }
 
 .table-container { overflow-x: auto; }
@@ -214,7 +236,27 @@ th {
     width: 90%;
     max-width: 600px;
     border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    max-height: 80vh; /* Make modal content scrollable if it exceeds 80% viewport height */
+    overflow-y: auto;
 }
+
+#quiz-loading {
+    text-align: center;
+    padding: 2rem;
+}
+
+#quiz-form {
+    display: flex;
+    flex-direction: column;
+}
+
+#quiz-questions-container {
+    overflow-y: auto; /* Enable scrolling for questions */
+    padding-right: 10px; /* Add some padding for the scrollbar */
+}
+
 .quiz-question {
     margin-bottom: 1.5rem;
     border-left: 3px solid var(--primary-color);
@@ -248,3 +290,7 @@ th {
 
 /* --- UTILITY --- */
 .hidden { display: none !important; }
+
+body.modal-open {
+    overflow: hidden;
+}

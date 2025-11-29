@@ -100,6 +100,10 @@
     <!-- Quiz Modal -->
     <div id="quiz-modal" class="modal-overlay hidden">
         <div class="modal-content">
+            <div id="quiz-loading" class="hidden">
+                <div class="spinner"></div>
+                <p>Loading questions...</p>
+            </div>
             <h2 id="quiz-title">Quest Challenge</h2>
             <form id="quiz-form">
                 <div id="quiz-questions-container">
@@ -122,6 +126,6 @@
         </div>
     </div>
 
-    <script src="/frontend/script.js"></script>
+    <script type="module" src="/frontend/script.js"></script>
 </body>
 </html>
