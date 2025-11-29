@@ -1,6 +1,6 @@
 
 import re
-from local_agents.writer import CompletePlan, DailyPlan, Task
+from backend.local_agents.writer import CompletePlan, DailyPlan, Task
 
 def parse_markdown_to_plan(markdown_text: str) -> CompletePlan:
     """Parses the Agent's markdown output into a structured Plan object."""

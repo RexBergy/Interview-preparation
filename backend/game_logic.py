@@ -3,7 +3,7 @@ import random
 from typing import List, Dict
 import pandas as pd
 
-from local_agents.writer import CompletePlan
+from backend.local_agents.writer import CompletePlan
 
 def init_game_state(plan: CompletePlan) -> List[Dict]:
     """Transforms the static 'CompletePlan' into an interactive 'Game State'."""

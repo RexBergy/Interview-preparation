@@ -10,7 +10,7 @@ from googleapiclient.discovery import build
 from dateutil import parser as date_parser
 import gradio as gr
 
-from local_agents.writer import CompletePlan
+from backend.local_agents.writer import CompletePlan
 
 # When running locally, disable OAuthlib's HTTPs verification.
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
