@@ -8,7 +8,6 @@ import google.oauth2.credentials
 import google_auth_oauthlib.flow
 from googleapiclient.discovery import build
 from dateutil import parser as date_parser
-import gradio as gr
 
 from backend.local_agents.writer import CompletePlan
 
@@ -45,7 +44,7 @@ def fetch_token(url: str):
     flow.fetch_token(authorization_response=url)
     return flow.credentials
 
-async def oauth2callback(request: gr.Request):
+async def oauth2callback(request):
     """
     Callback function for Google Calendar authentication.
     """
@@ -58,7 +57,7 @@ async def oauth2callback(request: gr.Request):
     except Exception as e:
         return f"Error: {e}"
 
-async def smart_schedule_quests(plan: CompletePlan, start_date: datetime, preferred_hour: int, progress=gr.Progress()):
+async def smart_schedule_quests(plan: CompletePlan, start_date: datetime, preferred_hour: int):
     """
     Scans the user's real calendar for free slots and schedules the Quests.
     """
@@ -143,6 +142,5 @@ async def smart_schedule_quests(plan: CompletePlan, start_date: datetime, prefer
                     cursor = proposed_end + timedelta(minutes=10) # Break
                     scheduled = True
                     tasks_done += 1
-                    progress((tasks_done / total_tasks), desc=f"📅 Scheduling: {task.name}")
     
     return "✅ All quests synced to Calendar!"
