@@ -39,8 +39,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function populateHoursSelect() {
+        const select = document.getElementById('hours');
+        const values = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 4, 5, 6, 8];
+
+        values.forEach(value => {
+            const option = document.createElement('option');
+            option.value = value;
+
+            let text = '';
+            if (value < 1) {
+                text = `${value * 60} min`;
+            } else {
+                const hours = Math.floor(value);
+                const minutes = (value % 1) * 60;
+                text = `${hours}h`;
+                if (minutes > 0) {
+                    text += ` ${minutes} min`;
+                }
+            }
+            option.textContent = text;
+
+            if (value === 2) {
+                option.selected = true;
+            }
+            select.appendChild(option);
+        });
+    }
+
     setMinDates();
     populateTimeSelect();
+    populateHoursSelect();
 
     // --- EVENT LISTENERS ---
     useCalCheckbox.addEventListener('change', () => {
