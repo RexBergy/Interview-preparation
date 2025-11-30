@@ -104,9 +104,27 @@ export function populateHoursSelect() {
  * @param {'setup' | 'loading' | 'game-board'} stepToShow - The ID suffix of the step to display.
  */
 export function showStep(stepToShow) {
-  DOM.setupStep.classList.toggle('hidden', stepToShow !== 'setup');
-  DOM.loadingStep.classList.toggle('hidden', stepToShow !== 'loading');
-  DOM.gameBoardStep.classList.toggle('hidden', stepToShow !== 'game-board');
+  const steps = {
+    setup: DOM.setupStep,
+    loading: DOM.loadingStep,
+    'game-board': DOM.gameBoardStep,
+  };
+
+  for (const stepName in steps) {
+    const stepElement = steps[stepName];
+    const isVisible = stepName === stepToShow;
+    
+    if (isVisible) {
+      stepElement.classList.remove('hidden');
+      // Set up and trigger animation for the appearing step
+      stepElement.classList.add('fade-in-slide-up');
+      // Use a timeout to ensure the transition is applied correctly
+      setTimeout(() => stepElement.classList.add('visible'), 50);
+    } else {
+      stepElement.classList.add('hidden');
+      stepElement.classList.remove('visible', 'fade-in-slide-up');
+    }
+  }
 }
 
 /**
@@ -171,6 +189,8 @@ function renderQuestBoard(board) {
     DOM.questBoardBody.innerHTML = ''; // Clear existing board
     board.forEach((task, index) => {
         const row = document.createElement('tr');
+        row.classList.add('fade-in-slide-up'); // Prepare for animation
+
         const isClickable = task.Status !== '🔒 LOCKED' && task.Status !== '✅ DONE';
         row.innerHTML = `
             <td>${task.Status}</td>
@@ -189,6 +209,11 @@ function renderQuestBoard(board) {
             </td>
         `;
         DOM.questBoardBody.appendChild(row);
+
+        // Stagger the animation for each row
+        setTimeout(() => {
+            row.classList.add('visible');
+        }, index * 100);
     });
 }
 

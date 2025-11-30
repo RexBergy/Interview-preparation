@@ -39,6 +39,23 @@ document.addEventListener('DOMContentLoaded', () => {
   populateTimeSelect();
   populateHoursSelect();
 
+  // --- DYNAMIC INTRO ANIMATIONS ---
+  const animatedElements = [
+    document.querySelector('.app-header'),
+    document.querySelector('.intro-section'),
+    document.querySelector('#setup-step')
+  ];
+
+  animatedElements.forEach((el, index) => {
+    if (el) {
+      el.classList.add('fade-in-slide-up');
+      setTimeout(() => {
+        el.classList.add('visible');
+      }, index * 200); // Stagger the animation
+    }
+  });
+
+
   // --- EVENT LISTENERS ---
 
   /**
