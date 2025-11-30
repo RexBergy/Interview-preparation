@@ -15,12 +15,17 @@ import { getGameState } from './api.js';
  * @const
  */
 export const DOM = {
+  introSection: document.querySelector('.intro-section'),
   setupStep: document.getElementById('setup-step'),
   loadingStep: document.getElementById('loading-step'),
   gameBoardStep: document.getElementById('game-board-step'),
   setupForm: document.getElementById('setup-form'),
-  useCalCheckbox: document.getElementById('use_cal'),
-  connectCalBtn: document.getElementById('connect-cal-btn'),
+  formPages: document.querySelectorAll('.form-page'),
+  nextBtn: document.getElementById('next-btn'),
+  prevBtn: document.getElementById('prev-btn'),
+  calYesBtn: document.getElementById('cal-yes-btn'),
+  calNoBtn: document.getElementById('cal-no-btn'),
+  generatePlanBtn: document.getElementById('generate-plan-btn'),
   planStreamEl: document.getElementById('plan-stream'),
   loadingStatusEl: document.getElementById('loading-status'),
   questBoardBody: document.querySelector('#quest-board-table tbody'),
@@ -110,6 +115,13 @@ export function showStep(stepToShow) {
     'game-board': DOM.gameBoardStep,
   };
 
+  // Hide intro section if not on the setup step
+  if (stepToShow !== 'setup') {
+    DOM.introSection.classList.add('hidden');
+  } else {
+    DOM.introSection.classList.remove('hidden');
+  }
+
   for (const stepName in steps) {
     const stepElement = steps[stepName];
     const isVisible = stepName === stepToShow;
@@ -172,6 +184,10 @@ export async function loadAndRenderGameBoard() {
 function renderPlayerStats(stats) {
     const progressPercent = stats.xp_per_level > 0 ? (stats.xp_in_level / stats.xp_per_level) * 100 : 0;
     DOM.playerStatsEl.innerHTML = `
+        <div class="intro-text">
+            <h2>Welcome to your Quest Board!</h2>
+            <p>Embark on your personalized journey to interview mastery. Conquer quests to gain XP, level up, and ultimately, ace your interview. Locked quests will become available as you progress. The timeline provided is a flexible guide based on your goals. Train your skills, and when you feel ready, enter the battle. You have three lives for each battle, make them count. Good luck, adventurer!</p>
+        </div>
         <h3>Level ${stats.level} ${stats.title}</h3>
         <div class="progress-bar-container">
             <div class="progress-bar" style="width: ${progressPercent}%"></div>
@@ -198,13 +214,13 @@ function renderQuestBoard(board) {
             <td>${task['Quest Objective']}</td>
             <td>${task.Rewards}</td>
             <td>
-                <button data-index="${index}" data-status="${task.Status}" ${!isClickable ? 'disabled' : ''}>
-                    ${task.Status === '✅ DONE' ? 'Completed' : 'Start'}
+                <button class="train-btn" data-quest="${task['Quest Objective']}" title="Train">
+                    📖
                 </button>
             </td>
             <td>
-                <button class="learn-more-btn" data-quest="${task['Quest Objective']}" title="Learn More">
-                    ❓
+                <button data-index="${index}" data-status="${task.Status}" ${!isClickable ? 'disabled' : ''}>
+                    ${task.Status === '✅ DONE' ? 'Completed' : 'start'}
                 </button>
             </td>
         `;

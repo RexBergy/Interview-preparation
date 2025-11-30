@@ -35,6 +35,7 @@ import { appState } from './state.js';
 document.addEventListener('DOMContentLoaded', () => {
   // --- INITIAL UI SETUP ---
   // Configure form elements with default and valid values.
+  appState.useCalendar = false;
   setMinDates();
   populateTimeSelect();
   populateHoursSelect();
@@ -42,7 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- DYNAMIC INTRO ANIMATIONS ---
   const animatedElements = [
     document.querySelector('.app-header'),
-    document.querySelector('.intro-section'),
     document.querySelector('#setup-step')
   ];
 
@@ -56,32 +56,71 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
 
-  // --- EVENT LISTENERS ---
+  // --- Multi-page Form Logic ---
+  let currentPage = 1;
+  const totalPages = DOM.formPages.length;
 
-  /**
-   * Toggles the "Connect" button's disabled state based on whether the
-   * "Sync with Google Calendar" checkbox is checked.
-   */
-  DOM.useCalCheckbox.addEventListener('change', () => {
-    DOM.connectCalBtn.disabled = !DOM.useCalCheckbox.checked;
+  const updateFormPage = () => {
+    DOM.formPages.forEach(page => {
+      const pageNum = parseInt(page.dataset.page, 10);
+      page.style.display = pageNum === currentPage ? 'block' : 'none';
+    });
+
+    DOM.prevBtn.style.display = currentPage > 1 ? 'block' : 'none';
+    DOM.nextBtn.style.display = currentPage < totalPages ? 'block' : 'none';
+  };
+
+  DOM.nextBtn.addEventListener('click', () => {
+    if (currentPage < totalPages) {
+      currentPage++;
+      updateFormPage();
+    }
   });
 
+  DOM.prevBtn.addEventListener('click', () => {
+    if (currentPage > 1) {
+      currentPage--;
+      updateFormPage();
+    }
+  });
+
+  // --- EVENT LISTENERS ---
+
+  const calendarQuestionGroup = DOM.calYesBtn.closest('.form-group');
+
   /**
-   * Handles the Google Calendar connection flow.
-   * On click, it calls the API to get an auth URL, opens it in a new tab,
-   * and updates the button state upon success.
+   * Handles the "Yes" button click for Google Calendar sync.
    */
-  DOM.connectCalBtn.addEventListener('click', async () => {
+  DOM.calYesBtn.addEventListener('click', async () => {
+    appState.useCalendar = true;
     try {
       const data = await connectCalendar();
       if (data.auth_url) {
         window.open(data.auth_url, '_blank');
-        DOM.connectCalBtn.textContent = 'Connected!';
-        DOM.connectCalBtn.disabled = true;
+        calendarQuestionGroup.style.display = 'none';
+        DOM.generatePlanBtn.style.display = 'block';
+      } else {
+        // If auth_url is not returned, something is wrong but not an exception
+        // We still hide the question and show the button, but don't sync.
+        appState.useCalendar = false;
+        calendarQuestionGroup.style.display = 'none';
+        DOM.generatePlanBtn.style.display = 'block';
       }
     } catch (error) {
-      alert(error.message); // Display friendly error to the user.
+      alert(error.message);
+      appState.useCalendar = false; // Revert on error
+      calendarQuestionGroup.style.display = 'none';
+      DOM.generatePlanBtn.style.display = 'block';
     }
+  });
+
+  /**
+   * Handles the "No" button click for Google Calendar sync.
+   */
+  DOM.calNoBtn.addEventListener('click', () => {
+    appState.useCalendar = false;
+    calendarQuestionGroup.style.display = 'none';
+    DOM.generatePlanBtn.style.display = 'block';
   });
 
   /**
@@ -93,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
     const formData = new FormData(DOM.setupForm);
     const data = Object.fromEntries(formData.entries());
-    data.use_cal = DOM.useCalCheckbox.checked;
+    data.use_cal = appState.useCalendar;
     appState.roleForQuiz = data.role; // Cache role for later use in quizzes.
 
     showStep('loading');
@@ -132,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
         alert(error.message);
         closeQuizModal();
       }
-    } else if (e.target.classList.contains('learn-more-btn')) {
+    } else if (e.target.classList.contains('train-btn')) {
       const quest = e.target.dataset.quest;
       const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(quest)}`;
       window.open(searchUrl, '_blank');

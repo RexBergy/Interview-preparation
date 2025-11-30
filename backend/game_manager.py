@@ -196,7 +196,6 @@ class GameManager:
         return f"""
         CONTEXT:
         - Candidate Role: {req.role}
-        - Goals: {req.goal}
         - Job Description: {req.job_description if req.job_description else "Not provided."}
         - Logistics: {days_available} days available, {req.hours} hours/day.
         

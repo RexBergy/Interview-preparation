@@ -19,7 +19,6 @@ class PlanRequest(BaseModel):
     This model is used to validate the input from the user's initial setup form.
     """
     role: str = Field(..., description="The user's target job role (e.g., 'Software Engineer').")
-    goal: str = Field(..., description="The user's primary learning or preparation goal.")
     job_description: Optional[str] = Field(None, description="An optional, detailed job description for creating a highly tailored plan.")
     hours: float = Field(..., gt=0, description="The number of hours the user commits to studying per day.")
     start_date: date = Field(..., description="The date the user intends to begin their study plan.")
