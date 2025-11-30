@@ -74,6 +74,15 @@ h3 {
     margin-top: 2rem;
 }
 
+.intro-section h2 {
+    margin-bottom: 0.5rem;
+}
+
+.intro-section h3 {
+    margin-bottom: 1.5rem;
+    margin-top: 1.5rem;
+}
+
 ol.steps {
     list-style-position: inside;
     margin-top: 1rem;

@@ -62,11 +62,18 @@ export function setMinDates() {
  */
 export function populateTimeSelect() {
   const select = document.getElementById('pref_time');
-  for (let i = 7; i <= 21; i++) {
+  const times = {
+    "Morning (7am-11am)": "9",
+    "Afternoon (12pm-5pm)": "13",
+    "Evening (6pm-9pm)": "18",
+    "Night (9pm-11pm)": "21"
+  };
+
+  for (const [text, value] of Object.entries(times)) {
     const option = document.createElement('option');
-    option.value = i;
-    option.textContent = `${i}:00 (${i < 12 ? i + ' AM' : (i === 12 ? '12 PM' : i - 12 + ' PM')})`;
-    if (i === 9) option.selected = true;
+    option.value = value;
+    option.textContent = text;
+    if (value === "9") option.selected = true;
     select.appendChild(option);
   }
 }
