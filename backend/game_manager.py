@@ -23,7 +23,7 @@ from agents import Runner
 from fastapi import HTTPException
 from openai.types.responses import ResponseTextDeltaEvent
 
-from backend.calendar_utils import smart_schedule_quests, calendar_service
+from backend.calendar_utils import smart_schedule_quests, request_calendar_service
 from backend.game_logic import init_game_state, render_quest_board, calculate_player_stats
 from backend.local_agents.writer import writer_agent
 from backend.plan_parser import parse_markdown_to_plan
@@ -98,11 +98,15 @@ class GameManager:
         except (ValueError, KeyError) as e:
             yield self._sse_event("error", f"Failed to parse the generated plan: {e}")
             return
+        
+        calendar_service = request_calendar_service()
 
         # Step 4: Sync with Google Calendar if requested and available.
+        print("Attempting to sync with Google Calendar...", req.use_cal, calendar_service)
         if req.use_cal and calendar_service:
             yield self._sse_event("status", "Syncing with Google Calendar...")
             try:
+                print("Attempting to sync with Google Calendar...")
                 await smart_schedule_quests(plan_obj, req.start_date, req.pref_time)
                 yield self._sse_event("status", "Calendar sync complete!")
             except Exception as e:

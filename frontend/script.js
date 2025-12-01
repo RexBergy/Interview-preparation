@@ -104,18 +104,21 @@ document.addEventListener('DOMContentLoaded', () => {
       if (data.auth_url) {
         window.open(data.auth_url, '_blank');
         calendarQuestionGroup.style.display = 'none';
+        DOM.prefTimeGroup.style.display = 'block'; // Show preferred study time input
         DOM.generatePlanBtn.style.display = 'block';
       } else {
         // If auth_url is not returned, something is wrong but not an exception
         // We still hide the question and show the button, but don't sync.
         appState.useCalendar = false;
         calendarQuestionGroup.style.display = 'none';
+        DOM.prefTimeGroup.style.display = 'block'; // Show preferred study time input
         DOM.generatePlanBtn.style.display = 'block';
       }
     } catch (error) {
       alert(error.message);
       appState.useCalendar = false; // Revert on error
       calendarQuestionGroup.style.display = 'none';
+      DOM.prefTimeGroup.style.display = 'block'; // Show preferred study time input
       DOM.generatePlanBtn.style.display = 'block';
     }
   });

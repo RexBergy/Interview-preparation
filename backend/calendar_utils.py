@@ -74,6 +74,7 @@ async def handle_calendar_oauth_callback(request: Request):
     Args:
         request: The incoming FastAPI request containing the full callback URL.
     """
+    print("Handling calendar OAuth2 callback...")
     global calendar_service
     # Reconstruct the full URL from the request for the flow.
     auth_url = str(request.url)
@@ -89,6 +90,9 @@ async def handle_calendar_oauth_callback(request: Request):
 
     # Build and store the calendar service resource.
     calendar_service = build("calendar", "v3", credentials=credentials)
+    print("Calendar service built successfully.")
+    print("Calendar sefice:",calendar_service)
+
 
 # --- Quest Scheduling Logic ---
 
@@ -200,3 +204,10 @@ def _create_calendar_event(task: Any, start_dt: datetime, end_dt: datetime):
     except Exception as e:
         # In a real app, you might want a more robust retry or logging mechanism.
         print(f"Failed to insert calendar event for task '{task.name}': {e}")
+
+
+def request_calendar_service() -> Resource | None:
+    """Returns the global calendar service instance."""
+    global calendar_service
+    return calendar_service
+    

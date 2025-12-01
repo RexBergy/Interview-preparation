@@ -43,6 +43,7 @@ export const DOM = {
   trainingTitle: document.getElementById('training-title'),
   trainingContent: document.getElementById('training-content'),
   closeTrainingBtn: document.getElementById('close-training-btn'),
+  prefTimeGroup: document.getElementById('pref-time-group'),
 };
 
 /**
