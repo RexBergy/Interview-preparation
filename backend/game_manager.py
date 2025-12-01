@@ -17,8 +17,10 @@ managed by FastAPI's dependency injection system.
 from datetime import datetime
 from typing import Dict, Any, AsyncGenerator, List, Tuple
 import json
+import asyncio # Import asyncio
 
 from agents import Runner
+from fastapi import HTTPException
 from openai.types.responses import ResponseTextDeltaEvent
 
 from backend.calendar_utils import smart_schedule_quests, calendar_service
@@ -26,6 +28,7 @@ from backend.game_logic import init_game_state, render_quest_board, calculate_pl
 from backend.local_agents.writer import writer_agent
 from backend.plan_parser import parse_markdown_to_plan
 from backend.quiz_engine import generate_quiz_for_task, QUIZ_PASS_THRESHOLD
+from backend.training_engine import generate_training_material
 from backend.schemas import PlanRequest
 
 
@@ -38,12 +41,16 @@ class GameManager:
         self.tasks: List[Dict[str, Any]] = []
         self.active_quiz: List[Dict[str, Any]] = []
         self.active_task_idx: int = -1
+        self.quizzes: Dict[int, List[Dict[str, Any]]] = {}
+        self.training_materials: Dict[int, Any] = {}
 
     def reset_game_state(self):
         """Resets the game state to its initial default values."""
         self.tasks = []
         self.active_quiz = []
         self.active_task_idx = -1
+        self.quizzes = {}
+        self.training_materials = {}
 
     async def generate_and_initialize_plan(
         self, req: PlanRequest
@@ -103,6 +110,42 @@ class GameManager:
                 yield self._sse_event("status", f"Calendar sync failed: {e}")
 
         yield self._sse_event("complete", "Plan generated successfully!")
+        
+        # Preload only the first quiz if tasks exist
+        if self.tasks:
+            yield self._sse_event("status", "Preloading the first quiz for your quests...")
+            idx = 0
+            task = self.tasks[idx]
+            try:
+                quiz_questions = generate_quiz_for_task(
+                    req.role,
+                    task['name'],
+                    task['desc'],
+                    task['difficulty']
+                )
+                self.quizzes[idx] = quiz_questions
+                yield self._sse_event("quiz_preloaded", {"task_index": idx, "status": "success"})
+            except Exception as e:
+                print(f"Error preloading quiz for task {idx}: {e}")
+                yield self._sse_event("quiz_preloaded", {"task_index": idx, "status": "error", "message": str(e)})
+            yield self._sse_event("complete", "First quiz preloaded!")
+        
+        # Preload only the first training material if tasks exist
+        if self.tasks:
+            yield self._sse_event("status", "Preloading the first training material for your quests...")
+            idx = 0
+            task = self.tasks[idx]
+            try:
+                training_material = generate_training_material(
+                    task['name'],
+                    task['desc']
+                )
+                self.training_materials[idx] = training_material
+                yield self._sse_event("training_preloaded", {"task_index": idx, "status": "success"})
+            except Exception as e:
+                print(f"Error preloading training material for task {idx}: {e}")
+                yield self._sse_event("training_preloaded", {"task_index": idx, "status": "error", "message": str(e)})
+            yield self._sse_event("complete", "First training material preloaded!")
 
     def get_current_game_state(self) -> Dict[str, Any] | None:
         """
@@ -132,7 +175,7 @@ class GameManager:
             },
         }
 
-    def start_new_quiz(self, task_index: int, role: str) -> Dict[str, Any]:
+    async def start_new_quiz(self, task_index: int, role: str) -> Dict[str, Any]:
         """
         Generates a new quiz for a given task and sets it as the active quiz.
 
@@ -144,15 +187,85 @@ class GameManager:
             A dictionary containing the quiz questions (without answers) and the task name,
             ready to be sent to the client.
         """
-        task = self.tasks[task_index]
-        quiz_questions = generate_quiz_for_task(role, task['name'], task['desc'], task['difficulty'])
+        if task_index >= len(self.tasks):
+            raise ValueError(f"Task index {task_index} is out of bounds.")
+
+        task = self.tasks[task_index] # Moved task assignment here
+
+        if task_index not in self.quizzes:
+            try:
+                # Generate the quiz on demand
+                quiz_questions = generate_quiz_for_task(
+                    role,
+                    task['name'],
+                    task['desc'],
+                    task['difficulty']
+                )
+                self.quizzes[task_index] = quiz_questions
+                print(f"Quiz for task index {task_index} generated on demand.")
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=f"Failed to generate quiz for task {task_index}: {e}")
+
+        quiz_questions = self.quizzes[task_index]
+        
+        if not isinstance(quiz_questions, list):
+            raise HTTPException(status_code=500, detail=f"Quiz data for task {task_index} is corrupted or not a list.")
         
         self.active_quiz = quiz_questions
         self.active_task_idx = task_index
 
         # Filter out the correct answer before sending to the client.
         client_questions = [{k: v for k, v in q.items() if k != 'correct_index'} for q in quiz_questions]
+
+        # Trigger preloading of the next quiz in the background
+        if task_index + 1 < len(self.tasks) and (task_index + 1) not in self.quizzes:
+            asyncio.create_task(self._preload_quiz_background(task_index + 1, role))
+
+        # Trigger preloading of the next training material in the background
+        if task_index + 1 < len(self.tasks) and (task_index + 1) not in self.training_materials:
+            asyncio.create_task(self._preload_training_background(task_index + 1))
+            
         return {"questions": client_questions, "task_name": task['name']}
+
+    async def _preload_quiz_background(self, task_index: int, role: str):
+        """
+        Asynchronously preloads a quiz for a given task in the background.
+        """
+        if task_index >= len(self.tasks):
+            return
+
+        if task_index not in self.quizzes:
+            task = self.tasks[task_index]
+            try:
+                quiz_questions = generate_quiz_for_task(
+                    role,
+                    task['name'],
+                    task['desc'],
+                    task['difficulty']
+                )
+                self.quizzes[task_index] = quiz_questions
+                print(f"Background: Quiz for task index {task_index} preloaded successfully.")
+            except Exception as e:
+                print(f"Background: Error preloading quiz for task {task_index}: {e}")
+
+    async def _preload_training_background(self, task_index: int):
+        """
+        Asynchronously preloads training material for a given task in the background.
+        """
+        if task_index >= len(self.tasks):
+            return
+
+        if task_index not in self.training_materials:
+            task = self.tasks[task_index]
+            try:
+                training_material = generate_training_material(
+                    task['name'],
+                    task['desc']
+                )
+                self.training_materials[task_index] = training_material
+                print(f"Background: Training material for task index {task_index} preloaded successfully.")
+            except Exception as e:
+                print(f"Background: Error preloading training material for task {task_index}: {e}")
 
     def process_quiz_submission(self, user_answers: List[str]) -> Dict[str, Any]:
         """

@@ -11,6 +11,7 @@ import {
   generatePlan,
   startQuiz,
   submitQuiz,
+  trainOnQuest,
 } from './api.js';
 import {
   DOM,
@@ -25,6 +26,8 @@ import {
   closeQuizModal,
   displayQuizResult,
   showQuizLoading,
+  openTrainingModal,
+  closeTrainingModal,
 } from './ui.js';
 import { appState } from './state.js';
 
@@ -34,7 +37,6 @@ import { appState } from './state.js';
  */
 document.addEventListener('DOMContentLoaded', () => {
   // --- INITIAL UI SETUP ---
-  // Configure form elements with default and valid values.
   appState.useCalendar = false;
   setMinDates();
   populateTimeSelect();
@@ -71,9 +73,13 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   DOM.nextBtn.addEventListener('click', () => {
+    console.log('Next button clicked. Current page before:', currentPage);
     if (currentPage < totalPages) {
       currentPage++;
       updateFormPage();
+      console.log('Current page after:', currentPage);
+    } else {
+      console.log('Already on the last page.');
     }
   });
 
@@ -165,7 +171,13 @@ document.addEventListener('DOMContentLoaded', () => {
       
       try {
         openQuizModal(); // Show loading state
-        const quizData = await startQuiz(taskIndex, appState.roleForQuiz);
+        let quizData;
+        if (appState.preloadedQuizzes[taskIndex]) {
+          quizData = appState.preloadedQuizzes[taskIndex];
+          console.log(`Using preloaded quiz for task ${taskIndex}`);
+        } else {
+          quizData = await startQuiz(taskIndex, appState.roleForQuiz);
+        }
         openQuizModal(quizData); // Populate with data
       } catch (error) {
         alert(error.message);
@@ -173,8 +185,24 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } else if (e.target.classList.contains('train-btn')) {
       const quest = e.target.dataset.quest;
-      const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(quest)}`;
-      window.open(searchUrl, '_blank');
+      try {
+        let trainingData = appState.preloadedTraining[quest]; // Try to get preloaded data
+
+        if (trainingData) {
+          console.log(`Using preloaded training for quest "${quest}"`);
+          openTrainingModal(trainingData); // Open with preloaded data immediately
+        } else {
+          // Data not preloaded, show loading state and fetch
+          openTrainingModal(); // Show loading spinner
+          console.log(`Fetching training for quest "${quest}"...`);
+          trainingData = await trainOnQuest(quest);
+          openTrainingModal(trainingData); // Once fetched, update modal with data
+        }
+        // No closeTrainingModal() here, as it should stay open until user clicks close button
+      } catch (error) {
+        alert(error.message);
+        closeTrainingModal(); // Close modal if an error occurs during fetch
+      }
     }
   });
 
@@ -201,7 +229,42 @@ document.addEventListener('DOMContentLoaded', () => {
    */
   DOM.closeQuizBtn.addEventListener('click', async () => {
     closeQuizModal();
-    await loadAndRenderGameBoard();
+    const state = await loadAndRenderGameBoard();
+    if (state) {
+      appState.currentQuestBoard = state.board;
+
+                  // Ensure preloadedQuizzes and preloadedTraining are initialized objects
+                  appState.preloadedQuizzes = appState.preloadedQuizzes || {};
+                  appState.preloadedTraining = appState.preloadedTraining || {};
+      
+                  // After closing quiz and re-rendering board, pre-fetch the next available quest's materials
+                  const nextActiveQuest = appState.currentQuestBoard.find(
+                    (task) => task.Status !== '🔒 LOCKED' && task.Status !== '✅ DONE'
+                  );
+      if (nextActiveQuest) {
+        const taskIndex = appState.currentQuestBoard.indexOf(nextActiveQuest);
+        
+        // Pre-fetch next quiz if not already preloaded
+        if (!appState.preloadedQuizzes[taskIndex]) {
+          startQuiz(taskIndex, appState.roleForQuiz)
+            .then(quizData => {
+              appState.preloadedQuizzes[taskIndex] = quizData;
+              console.log(`Pre-fetched next quiz for task ${taskIndex}`);
+            })
+            .catch(error => console.error(`Error pre-fetching next quiz for task ${taskIndex}:`, error));
+        }
+
+        // Pre-fetch next training if not already preloaded
+        if (!appState.preloadedTraining[nextActiveQuest['Quest Objective']]) {
+          trainOnQuest(nextActiveQuest['Quest Objective'])
+            .then(trainingData => {
+              appState.preloadedTraining[nextActiveQuest['Quest Objective']] = trainingData;
+              console.log(`Pre-fetched next training for quest "${nextActiveQuest['Quest Objective']}"`);
+            })
+            .catch(error => console.error(`Error pre-fetching next training for quest "${nextActiveQuest['Quest Objective']}":`, error));
+        }
+      }
+    }
   });
 
   /**
@@ -210,6 +273,13 @@ document.addEventListener('DOMContentLoaded', () => {
    */
   DOM.restartGameBtn.addEventListener('click', () => {
     window.location.reload();
+  });
+
+  /**
+   * Handles closing the training modal.
+   */
+  DOM.closeTrainingBtn.addEventListener('click', () => {
+    closeTrainingModal();
   });
 
   // --- HELPER FUNCTIONS ---
@@ -227,7 +297,36 @@ document.addEventListener('DOMContentLoaded', () => {
         if (done) {
             // Once the stream is finished, load the main game board.
             updateLoadingStatus('Loading game board...');
-            await loadAndRenderGameBoard();
+            const state = await loadAndRenderGameBoard();
+            if (state) {
+              appState.currentQuestBoard = state.board;
+              // Pre-load the first available quiz and training material
+              const firstActiveQuest = appState.currentQuestBoard.find(
+                (task) => task.Status !== '🔒 LOCKED' && task.Status !== '✅ DONE'
+              );
+              if (firstActiveQuest) {
+                const taskIndex = appState.currentQuestBoard.indexOf(firstActiveQuest);
+                // Pre-load quiz
+                          startQuiz(taskIndex, appState.roleForQuiz)
+                            .then(quizData => {
+                              console.log("Debug: appState before preloading quiz:", appState);
+                              console.log("Debug: appState.preloadedQuizzes before preloading quiz:", appState.preloadedQuizzes);
+                              appState.preloadedQuizzes[taskIndex] = quizData;
+                              console.log(`Preloaded quiz for task ${taskIndex}`);
+                            })
+                            .catch(error => console.error(`Error preloading quiz for task ${taskIndex}:`, error));
+                
+                        // Pre-load training
+                        trainOnQuest(firstActiveQuest['Quest Objective'])
+                          .then(trainingData => {
+                            console.log("Debug: appState before preloading training:", appState);
+                            console.log("Debug: appState.preloadedTraining before preloading training:", appState.preloadedTraining);
+                            appState.preloadedTraining[firstActiveQuest['Quest Objective']] = trainingData;
+                            console.log(`Preloaded training for quest "${firstActiveQuest['Quest Objective']}"`);
+                  })
+                  .catch(error => console.error(`Error preloading training for quest "${firstActiveQuest['Quest Objective']}":`, error));
+              }
+            }
             showStep('game-board');
             break;
         }

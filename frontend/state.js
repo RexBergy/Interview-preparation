@@ -15,4 +15,7 @@
  */
 export const appState = {
   roleForQuiz: '',
+  preloadedQuizzes: {},    // Stores quizzes, keyed by taskIndex
+  preloadedTraining: {},   // Stores training material, keyed by quest string
+  currentQuestBoard: [],   // To store the latest quest board for determining next quests
 };

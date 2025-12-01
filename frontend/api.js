@@ -88,10 +88,9 @@ export async function startQuiz(taskIndex, role) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ task_index: taskIndex, role }),
     });
-    if (!response.ok) {
-      throw new Error('Failed to load quiz data from the server.');
-    }
-    return await response.json();
+    const quizData = await response.json();
+    console.log("startQuiz received:", quizData);
+    return quizData;
   } catch (error) {
     console.error('Error starting quiz:', error);
     throw new Error('Could not start the quiz for this quest. The server might be busy.');
@@ -118,5 +117,24 @@ export async function submitQuiz(answers) {
   } catch (error) {
     console.error('Error submitting quiz:', error);
     throw new Error('Could not submit your answers. Please check your network connection.');
+  }
+}
+
+export async function trainOnQuest(quest) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/train`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ quest: quest }),
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const trainingData = await response.json();
+    console.log("trainOnQuest received:", trainingData);
+    return trainingData;
+  } catch (error) {
+    console.error('Error getting training materials:', error);
+    throw new Error('Could not get training materials. Please check your network connection.');
   }
 }

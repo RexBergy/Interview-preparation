@@ -13,7 +13,10 @@ from fastapi.responses import JSONResponse
 
 from backend.dependencies import get_game_manager
 from backend.game_manager import GameManager
-from backend.schemas import PlanRequest, QuizStartRequest, QuizSubmitRequest
+from backend.schemas import PlanRequest, QuizStartRequest, QuizSubmitRequest, TrainRequest
+
+from backend.training_engine import generate_training_material
+
 
 # Create an API router for game-related endpoints.
 router = APIRouter()
@@ -59,7 +62,7 @@ def get_game_state(manager: GameManager = Depends(get_game_manager)):
 
 
 @router.post("/start_quiz", summary="Start a New Quiz for a Task")
-def start_quiz(req: QuizStartRequest, manager: GameManager = Depends(get_game_manager)):
+async def start_quiz(req: QuizStartRequest, manager: GameManager = Depends(get_game_manager)):
     """
     Initiates a new quiz for a specific task on the quest board.
 
@@ -76,7 +79,9 @@ def start_quiz(req: QuizStartRequest, manager: GameManager = Depends(get_game_ma
     if not (0 <= req.task_index < len(manager.tasks)):
         raise HTTPException(status_code=400, detail="Invalid task index.")
 
-    return manager.start_new_quiz(req.task_index, req.role)
+    quiz_data = await manager.start_new_quiz(req.task_index, req.role)
+    print(f"Returning quiz data: {quiz_data}")
+    return quiz_data
 
 
 @router.post("/quiz/submit", summary="Submit Answers for the Active Quiz")
@@ -99,3 +104,40 @@ def submit_quiz(req: QuizSubmitRequest, manager: GameManager = Depends(get_game_
 
     result = manager.process_quiz_submission(req.answers)
     return result
+
+
+@router.post("/train", summary="Get Training Materials for a Task")
+def train(req: TrainRequest, manager: GameManager = Depends(get_game_manager)):
+    """
+    Provides training materials for a specific task (quest).
+
+    This endpoint searches for relevant educational resources based on the
+    task description and returns a curated list of the best sources.
+
+    Args:
+        req (TrainRequest): The request body containing the task name.
+        manager (GameManager): The dependency-injected game manager instance.
+
+    Returns:
+        dict: A dictionary containing the training materials.
+    """
+    quest_name = req.quest
+    
+    # Find the task in the game manager's task list.
+    task_index = next((i for i, t in enumerate(manager.tasks) if t.get('name') == quest_name), None)
+
+    if task_index is None:
+        raise HTTPException(status_code=404, detail=f"Task '{quest_name}' not found.")
+
+    # Check if training material is already preloaded
+    if task_index in manager.training_materials:
+        print(f"Returning preloaded training material for task {quest_name}")
+        return manager.training_materials[task_index]
+
+    # If not preloaded, generate training material on demand
+    task = manager.tasks[task_index]
+    training_material = generate_training_material(task['name'], task['desc'])
+    manager.training_materials[task_index] = training_material # Cache it for future requests
+    
+    print(f"Returning newly generated training material for task {quest_name}")
+    return training_material

@@ -38,3 +38,9 @@ class QuizSubmitRequest(BaseModel):
     Defines the data structure for a request to submit quiz answers for evaluation.
     """
     answers: List[str] = Field(..., description="An ordered list of the user's selected answers for the active quiz.")
+
+class TrainRequest(BaseModel):
+    """
+    Defines the data structure for a request to get training materials for a specific task.
+    """
+    quest: str = Field(..., description="The description of the task to get training materials for.")

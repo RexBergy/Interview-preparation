@@ -39,6 +39,10 @@ export const DOM = {
   closeQuizBtn: document.getElementById('close-quiz-btn'),
   gameOverModal: document.getElementById('game-over-modal'),
   restartGameBtn: document.getElementById('restart-game-btn'),
+  trainingModal: document.getElementById('training-modal'),
+  trainingTitle: document.getElementById('training-title'),
+  trainingContent: document.getElementById('training-content'),
+  closeTrainingBtn: document.getElementById('close-training-btn'),
 };
 
 /**
@@ -172,9 +176,11 @@ export async function loadAndRenderGameBoard() {
         const state = await getGameState();
         renderPlayerStats(state.stats);
         renderQuestBoard(state.board);
+        return state; // Return the entire state object
     } catch (error) {
         console.error(error);
         alert(error.message); // Inform the user of the failure.
+        return null; // Return null on error
     }
 }
 
@@ -337,4 +343,55 @@ export function displayQuizResult(result) {
 export function showGameOverModal() {
     DOM.gameOverModal.classList.remove('hidden');
     document.body.classList.add('modal-open');
+}
+
+/**
+ * Opens and populates the training modal with learning resources.
+ * @param {object} [data] - Optional training data from the server. If not provided, a loading message is displayed.
+ * @param {string} [data.explanation] - A text explanation of the topic.
+ * @param {Array<string>} [data.resources] - A list of resource URLs.
+ */
+export function openTrainingModal(data) {
+  DOM.trainingModal.classList.remove('hidden');
+  document.body.classList.add('modal-open');
+
+  DOM.trainingTitle.textContent = `Training Room`;
+  
+  if (!data) {
+    DOM.trainingContent.innerHTML = `
+      <div class="loading-spinner-container">
+        <div class="loading-spinner"></div>
+        <p>Loading training materials...</p>
+      </div>
+    `;
+    return;
+  }
+
+  let resourcesHtml = '<h3>Recommended Resources</h3><ul>';
+  if (data.resources && data.resources.length > 0) {
+    data.resources.forEach(url => {
+      resourcesHtml += `
+        <li>
+          <a href="${url}" target="_blank">${url}</a>
+        </li>
+      `;
+    });
+  } else {
+    resourcesHtml += '<li>No resources found.</li>';
+  }
+  resourcesHtml += '</ul>';
+
+  DOM.trainingContent.innerHTML = `
+    <h3>Core Concepts</h3>
+    <p>${data.explanation}</p>
+    ${resourcesHtml}
+  `;
+}
+
+/**
+ * Closes the training modal.
+ */
+export function closeTrainingModal() {
+  DOM.trainingModal.classList.add('hidden');
+  document.body.classList.remove('modal-open');
 }

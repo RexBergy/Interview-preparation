@@ -133,7 +133,7 @@ ol.steps li::marker {
 }
 
 #role {
-    max-width: 25%; /* A bit more than 15% for better usability */
+    max-width: 30%; /* A bit more than 15% for better usability */
 }
 
 .form-group {
@@ -401,11 +401,74 @@ th {
     margin: 1rem 0;
 }
 
+/* --- TRAINING MODAL --- */
+#training-modal .modal-content {
+    gap: 1.5rem;
+}
+
+#training-title {
+    text-align: center;
+}
+
+#training-content h3 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--accent-color);
+    font-size: 1.2rem;
+}
+
+#training-content ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+#training-content li {
+    background: #333;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    border-left: 3px solid var(--primary-color);
+}
+
+#training-content a {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+#training-content a:hover {
+    text-decoration: underline;
+}
+
+#training-content p {
+    margin-bottom: 1rem;
+}
+
+#close-training-btn {
+    align-self: center;
+}
+
 /* --- UTILITY --- */
 
 .hidden { display: none !important; }
 
+.loading-spinner-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    gap: 1rem;
+}
 
+.loading-spinner {
+    border: 4px solid #ffffff20;
+    border-top: 4px solid var(--primary-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
 
 body.modal-open {
 
