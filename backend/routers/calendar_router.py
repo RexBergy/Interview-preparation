@@ -28,6 +28,7 @@ def connect_calendar():
         dict: A dictionary containing the `auth_url` for the user to visit.
     """
     auth_url = get_calendar_connect_url()
+    print(f"Generated auth URL: {auth_url}")
     return {"auth_url": auth_url}
 
 
@@ -47,7 +48,9 @@ async def handle_oauth2callback(request: Request):
         HTMLResponse: A simple HTML page to notify the user of success and
                       instruct them to close the tab.
     """
+    print("Received OAuth2 callback")
     await handle_calendar_oauth_callback(request)
+
     return HTMLResponse(
         content="""
         <html>
