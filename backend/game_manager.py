@@ -43,6 +43,7 @@ class GameManager:
         self.active_task_idx: int = -1
         self.quizzes: Dict[int, List[Dict[str, Any]]] = {}
         self.training_materials: Dict[int, Any] = {}
+        self.role: str = ""
 
     def reset_game_state(self):
         """Resets the game state to its initial default values."""
@@ -51,6 +52,7 @@ class GameManager:
         self.active_task_idx = -1
         self.quizzes = {}
         self.training_materials = {}
+        self.role = ""
 
     async def generate_and_initialize_plan(
         self, req: PlanRequest
@@ -74,6 +76,7 @@ class GameManager:
                  Events can be of type 'plan_chunk', 'status', or 'complete'.
         """
         self.reset_game_state()
+        self.role = req.role
 
         # Step 1: Generate a detailed prompt for the AI agent.
         system_prompt = self._build_system_prompt(req)
@@ -177,6 +180,7 @@ class GameManager:
                 "xp_in_level": stats["xp_in_level"],
                 "xp_per_level": stats["xp_per_level"],
             },
+            "role": self.role,
         }
 
     async def start_new_quiz(self, task_index: int, role: str) -> Dict[str, Any]:
@@ -305,15 +309,19 @@ class GameManager:
             }
         else:
             self.tasks[idx]['lives'] -= 1
+            lives_left = self.tasks[idx]['lives']
+            
             result = {
                 "passed": False,
                 "score": score,
                 "total": len(quiz_data),
-                "lives_left": self.tasks[idx]['lives'],
+                "lives_left": lives_left,
             }
-            if self.tasks[idx]['lives'] <= 0:
-                result["game_over"] = True
+            if lives_left <= 0:
+                self.tasks[idx]['lives'] = 3  # Reset lives
                 result["quiz_data"] = quiz_data
+                if idx in self.quizzes:
+                    del self.quizzes[idx] # Force regeneration
             return result
 
     def _build_system_prompt(self, req: PlanRequest) -> str:

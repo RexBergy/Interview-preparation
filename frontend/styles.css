@@ -288,13 +288,21 @@ button:disabled {
 }
 
 /* --- GAME BOARD & STATS --- */
+#quest-board-intro,
 #player-stats {
     background: #222;
     border: 2px ridge var(--border-color);
     border-radius: 8px;
-    padding: 1rem;
-    margin-bottom: 2rem;
+    padding: 1.5rem;
     text-align: center;
+}
+
+#quest-board-intro {
+    margin-bottom: 4rem;
+}
+
+#player-stats {
+    margin-bottom: 2rem;
 }
 .progress-bar-container {
     width: 100%;

@@ -30,6 +30,7 @@ export const DOM = {
   loadingStatusEl: document.getElementById('loading-status'),
   questBoardBody: document.querySelector('#quest-board-table tbody'),
   playerStatsEl: document.getElementById('player-stats'),
+  questBoardIntro: document.getElementById('quest-board-intro'),
   quizModal: document.getElementById('quiz-modal'),
   quizForm: document.getElementById('quiz-form'),
   quizTitle: document.getElementById('quiz-title'),
@@ -175,7 +176,8 @@ export function updateLoadingStatus(statusText) {
 export async function loadAndRenderGameBoard() {
     try {
         const state = await getGameState();
-        renderPlayerStats(state.stats);
+        renderQuestBoardIntro();
+        renderPlayerStats(state);
         renderQuestBoard(state.board);
         return state; // Return the entire state object
     } catch (error) {
@@ -185,24 +187,27 @@ export async function loadAndRenderGameBoard() {
     }
 }
 
-/**
- * Renders the player's statistics section, including level, title, XP, and lives.
- * @param {object} stats - The player's stats object from the game state.
- * @property {number} stats.level - The player's current level.
- * @property {string} stats.title - The player's current title (e.g., "Novice").
- * @property {number} stats.xp_in_level - XP earned within the current level.
- * @property {number} stats.xp_per_level - Total XP required for the current level.
- * @property {number} stats.lives - Remaining lives.
- * @property {number} stats.xp - Total accumulated XP.
- */
-function renderPlayerStats(stats) {
-    const progressPercent = stats.xp_per_level > 0 ? (stats.xp_in_level / stats.xp_per_level) * 100 : 0;
-    DOM.playerStatsEl.innerHTML = `
+function renderQuestBoardIntro() {
+    DOM.questBoardIntro.innerHTML = `
         <div class="intro-text">
             <h2>Welcome to your Quest Board!</h2>
-            <p>Embark on your personalized journey to interview mastery. Conquer quests to gain XP, level up, and ultimately, ace your interview. Locked quests will become available as you progress. The timeline provided is a flexible guide based on your goals. Train your skills, and when you feel ready, take the quizz. You have three tries for each quizz, make them count. Good luck!</p>
+            <p>Embark on your personalized journey to interview mastery. Accomplish tasks to gain XP, level up, and ultimately, ace your interview. Locked tasks will become available as you progress. The timeline provided is a flexible guide based on your goals. Train your skills with the book icon, and when you feel ready, take the quizz. You have three tries for each quizz, make them count. Good luck!</p>
         </div>
-        <h3>Level ${stats.level} ${stats.title}</h3>
+    `;
+}
+
+/**
+ * Renders the player's statistics section, including level, title, XP, and lives.
+ * @param {object} state - The full game state object from the server.
+ * @property {object} state.stats - The player's stats object.
+ * @property {string} state.role - The player's target role.
+ */
+function renderPlayerStats(state) {
+    const { stats, role } = state;
+    const progressPercent = stats.xp_per_level > 0 ? (stats.xp_in_level / stats.xp_per_level) * 100 : 0;
+    DOM.playerStatsEl.innerHTML = `
+        <h3><strong>${role}</strong> </h3>
+        <h4>Level ${stats.level} ${stats.title}</h4>
         <div class="progress-bar-container">
             <div class="progress-bar" style="width: ${progressPercent}%"></div>
             <div class="progress-bar-text">${stats.xp_in_level} / ${stats.xp_per_level} XP</div>
@@ -269,7 +274,7 @@ export function openQuizModal(quizData) {
     document.body.classList.add('modal-open');
 
     if (quizData) {
-        DOM.quizTitle.textContent = `⚔️ Quest: ${quizData.task_name}`;
+        DOM.quizTitle.textContent = `${quizData.task_name}`;
         DOM.quizQuestionsContainer.innerHTML = ''; // Clear previous questions
         quizData.questions.forEach((q, i) => {
             const questionDiv = document.createElement('div');
@@ -320,14 +325,14 @@ export function displayQuizResult(result) {
     DOM.closeQuizBtn.classList.remove('hidden');
 
     let message = '';
-    if (result.passed || result.game_over) {
+    if (result.passed || result.lives_left <= 0) {
         DOM.quizResultEl.className = result.passed ? 'result-success' : 'result-fail';
         
         const title = result.passed
-            ? `<h3>🎉 Victory! Quest Complete! 🎉</h3>`
+            ? `<h3>🎉 Success! Task Complete! 🎉</h3>`
             : `<h3>Failure ...</h3>`;
         
-        const score = `<p>Final Score: ${result.score}/${result.total}</p>`;
+        const score = `<p>Final Score: ${result.score}/${result.total}</p><p>You can try this quest again with a new set of questions.</p>`;
 
         const answersHTML = result.quiz_data.map((q, i) => {
             const userAnswer = DOM.quizForm.elements[`q${i}`].value;
@@ -363,13 +368,6 @@ export function displayQuizResult(result) {
     }
 
     DOM.quizResultEl.innerHTML = message;
-
-    // Special handling for game over outside of the quiz modal
-    if (result.game_over) {
-        closeQuizModal();
-        showGameOverModal(message); // Pass the detailed results to the game over modal
-        return;
-    }
 }
 
 
@@ -382,14 +380,14 @@ export function showGameOverModal(detailsHtml = '') {
     modalContent.innerHTML = ''; // Clear previous content
 
     const title = document.createElement('h2');
-    title.textContent = 'Game Over';
+    title.textContent = 'Results';
 
     const text = document.createElement('p');
-    text.textContent = "You've run out of tries on this quest! Don't worry, a true hero gets back up. You can try this quest again with a new set of questions.";
+    text.textContent = "You've run out of tries on this task! Don't worry, a true hero gets back up. You can try this quest again with a new set of questions.";
 
     const art = document.createElement('p');
     art.className = 'game-over-art';
-    art.textContent = '💀';
+    // art.textContent = '';
 
     modalContent.appendChild(title);
     modalContent.appendChild(text);

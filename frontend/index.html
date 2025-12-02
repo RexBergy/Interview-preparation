@@ -72,8 +72,8 @@
 
                     <div class="form-page" data-page="4" style="display: none;">
                         <div class="form-group">
-                            <h3>Add Your Quests to Google Calendar?</h3>
-                            <p>Stay on track by syncing your personalized quest deadlines with your Google Calendar.</p>
+                            <h3>Add Your Tasks to Google Calendar?</h3>
+                            <p>Stay on track by syncing your personalized task deadlines with your Google Calendar.</p>
                             <div class="calendar-actions">
                                 <button type="button" id="cal-yes-btn" class="primary-btn">Yes, sync my calendar</button>
                                 <button type="button" id="cal-no-btn" class="secondary-btn">No, I'll track it myself</button>
@@ -105,6 +105,10 @@
 
             <!-- Step 3: Game Board -->
             <div id="game-board-step" class="hidden">
+                <div id="quest-board-intro">
+                    <!-- Welcome message will be rendered here -->
+                </div>
+                <br>
                 <div id="player-stats">
                     <!-- Player stats will be rendered here -->
                 </div>
@@ -114,7 +118,7 @@
                             <tr>
                                 <th>Status</th>
                                 <th>Timeline</th>
-                                <th>Quest Objective</th>
+                                <th>Task Name</th>
                                 <th>Rewards</th>
                                 <th>Train</th>
                                 <th>Quizz</th>
@@ -152,8 +156,8 @@
     <!-- Game Over Modal -->
     <div id="game-over-modal" class="modal-overlay hidden">
         <div class="modal-content">
-            <h2>Game Over</h2>
-            <p>You've run out of tries on this quest! Don't worry, a true hero gets back up. You can try this quest again with a new set of questions.</p>
+            <h2>Results</h2>
+            <p>You've run out of tries on this task! Don't worry, a true hero gets back up. You can try this task again with a new set of questions.</p>
             <button id="restart-game-btn">Try Again</button>
         </div>
     </div>

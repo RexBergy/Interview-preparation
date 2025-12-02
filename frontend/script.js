@@ -203,11 +203,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       
       try {
+        appState.activeTaskIndex = taskIndex;
         openQuizModal(); // Show loading state
         let quizData;
         if (appState.preloadedQuizzes[taskIndex]) {
           quizData = appState.preloadedQuizzes[taskIndex];
-          console.log(`Using preloaded quiz for task ${taskIndex}`);
+          console.log(`Using preloaded quiz for task ${taskIndex}:`, JSON.parse(JSON.stringify(quizData)));
         } else {
           quizData = await startQuiz(taskIndex, appState.roleForQuiz);
         }
@@ -248,8 +249,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const formData = new FormData(DOM.quizForm);
     const answers = Array.from(formData.values());
     
+    console.log('Quiz form submitted. Calling submitQuiz with answers:', answers);
     try {
       const result = await submitQuiz(answers);
+      if (result.lives_left <= 0) {
+        // Clear the frontend cache for this quiz to force regeneration
+        if (appState.activeTaskIndex !== null) {
+          console.log('Before deletion:', JSON.parse(JSON.stringify(appState.preloadedQuizzes)));
+          delete appState.preloadedQuizzes[appState.activeTaskIndex];
+          console.log(`Cleared preloaded quiz for task ${appState.activeTaskIndex} to force regeneration.`);
+          console.log('After deletion:', JSON.parse(JSON.stringify(appState.preloadedQuizzes)));
+        }
+      }
       displayQuizResult(result); // Show the outcome to the user.
     } catch (error) {
       alert(error.message);
@@ -279,10 +290,12 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Pre-fetch next quiz if not already preloaded
         if (!appState.preloadedQuizzes[taskIndex]) {
+          console.log(`Pre-fetching new quiz for task ${taskIndex}...`);
           startQuiz(taskIndex, appState.roleForQuiz)
             .then(quizData => {
+              console.log('Received new quiz data for pre-fetch:', JSON.parse(JSON.stringify(quizData)));
               appState.preloadedQuizzes[taskIndex] = quizData;
-              console.log(`Pre-fetched next quiz for task ${taskIndex}`);
+              console.log(`Pre-fetched and cached new quiz for task ${taskIndex}`);
             })
             .catch(error => console.error(`Error pre-fetching next quiz for task ${taskIndex}:`, error));
         }

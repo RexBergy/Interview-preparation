@@ -104,6 +104,7 @@ export async function startQuiz(taskIndex, role) {
  * @throws {Error} If the submission fails or the server returns an error.
  */
 export async function submitQuiz(answers) {
+  console.log('Inside api.js/submitQuiz function.');
   try {
     const response = await fetch(`${API_BASE_URL}/api/quiz/submit`, {
       method: 'POST',
@@ -113,7 +114,9 @@ export async function submitQuiz(answers) {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    return await response.json();
+    const result = await response.json();
+    console.log('API submitQuiz received raw result:', JSON.parse(JSON.stringify(result)));
+    return result;
   } catch (error) {
     console.error('Error submitting quiz:', error);
     throw new Error('Could not submit your answers. Please check your network connection.');
