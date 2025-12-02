@@ -98,6 +98,7 @@ def _build_quiz_prompt(role: str, task_name: str, task_desc: str, difficulty: st
 
     INSTRUCTIONS:
     Your task is to generate {num_questions} distinct, high-quality multiple-choice questions to test the user's understanding of the completed quest.
+    For each question, provide a brief justification for the correct answer. This justification will be shown to the user after the quiz.
     The questions must be directly relevant to the quest's topic and appropriate for the specified role and difficulty.
 
     OUTPUT FORMAT:
@@ -107,11 +108,12 @@ def _build_quiz_prompt(role: str, task_name: str, task_desc: str, difficulty: st
             {{
                 "q": "The question text goes here.",
                 "options": ["Option A", "Option B", "Option C", "Option D"],
-                "correct_index": 0
+                "correct_index": 0,
+                "justification": "A brief explanation of why this is the correct answer."
             }},
             // ... more question objects
         ]
     }}
     
-    IMPORTANT: The "correct_index" field is mandatory and must be an integer (0, 1, 2, or 3) representing the index of the correct answer in the "options" list.
+    IMPORTANT: The "correct_index" field is mandatory and must be an integer (0, 1, 2, or 3) representing the index of the correct answer in the "options" list. The "justification" field is also mandatory.
     """

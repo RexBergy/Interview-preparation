@@ -218,8 +218,11 @@ class GameManager:
         self.active_quiz = quiz_questions
         self.active_task_idx = task_index
 
-        # Filter out the correct answer before sending to the client.
-        client_questions = [{k: v for k, v in q.items() if k != 'correct_index'} for q in quiz_questions]
+        # Filter out the correct answer and justification before sending to the client.
+        client_questions = [
+            {k: v for k, v in q.items() if k not in ['correct_index', 'justification']}
+            for q in quiz_questions
+        ]
 
         # Trigger preloading of the next quiz in the background
         if task_index + 1 < len(self.tasks) and (task_index + 1) not in self.quizzes:
@@ -294,7 +297,12 @@ class GameManager:
             # Unlock the next task if it exists
             if idx + 1 < len(self.tasks):
                 self.tasks[idx + 1]['status'] = "UNLOCKED"
-            return {"passed": True, "score": score, "total": len(quiz_data)}
+            return {
+                "passed": True,
+                "score": score,
+                "total": len(quiz_data),
+                "quiz_data": quiz_data,
+            }
         else:
             self.tasks[idx]['lives'] -= 1
             result = {
@@ -305,6 +313,7 @@ class GameManager:
             }
             if self.tasks[idx]['lives'] <= 0:
                 result["game_over"] = True
+                result["quiz_data"] = quiz_data
             return result
 
     def _build_system_prompt(self, req: PlanRequest) -> str:

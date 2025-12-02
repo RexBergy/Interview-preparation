@@ -200,7 +200,7 @@ function renderPlayerStats(stats) {
     DOM.playerStatsEl.innerHTML = `
         <div class="intro-text">
             <h2>Welcome to your Quest Board!</h2>
-            <p>Embark on your personalized journey to interview mastery. Conquer quests to gain XP, level up, and ultimately, ace your interview. Locked quests will become available as you progress. The timeline provided is a flexible guide based on your goals. Train your skills, and when you feel ready, enter the battle. You have three lives for each battle, make them count. Good luck, adventurer!</p>
+            <p>Embark on your personalized journey to interview mastery. Conquer quests to gain XP, level up, and ultimately, ace your interview. Locked quests will become available as you progress. The timeline provided is a flexible guide based on your goals. Train your skills, and when you feel ready, take the quizz. You have three tries for each quizz, make them count. Good luck!</p>
         </div>
         <h3>Level ${stats.level} ${stats.title}</h3>
         <div class="progress-bar-container">
@@ -320,30 +320,101 @@ export function displayQuizResult(result) {
     DOM.closeQuizBtn.classList.remove('hidden');
 
     let message = '';
-    if (result.passed) {
-        DOM.quizResultEl.className = 'result-success';
-        message = `<h3>🎉 Victory! Quest Complete! 🎉</h3>
-                   <p>Score: ${result.score}/${result.total}</p>`;
-    } else {
+    if (result.passed || result.game_over) {
+        DOM.quizResultEl.className = result.passed ? 'result-success' : 'result-fail';
+        
+        const title = result.passed
+            ? `<h3>🎉 Victory! Quest Complete! 🎉</h3>`
+            : `<h3>Failure ...</h3>`;
+        
+        const score = `<p>Final Score: ${result.score}/${result.total}</p>`;
+
+        const answersHTML = result.quiz_data.map((q, i) => {
+            const userAnswer = DOM.quizForm.elements[`q${i}`].value;
+            const correctAnswer = q.options[q.correct_index];
+            const isCorrect = userAnswer === correctAnswer;
+
+            let answerDetail = '';
+            if (isCorrect) {
+                answerDetail = `<p class="correct-answer">Your answer: ${userAnswer}</p>`;
+            } else {
+                answerDetail = `
+                    <p class="wrong-answer">Your answer: ${userAnswer}</p>
+                    <p class="correct-answer">Correct answer: ${correctAnswer}</p>
+                `;
+            }
+
+            return `
+                <div class="result-question">
+                    <p><strong>${i + 1}. ${q.q}</strong></p>
+                    ${answerDetail}
+                    <p class="justification"><strong>Justification:</strong> ${q.justification}</p>
+                </div>
+            `;
+        }).join('');
+
+        message = `${title}${score}<div class="results-breakdown">${answersHTML}</div>`;
+
+    } else { // Failed but has lives left
         DOM.quizResultEl.className = 'result-fail';
-        if (result.game_over) {
-            closeQuizModal();
-            showGameOverModal();
-            return;
-        }
         message = `<h3>Incorrect</h3>
-                   <p>Score: ${result.score}/${result.total}. You lost a life!</p>
-                   <p>You have ${result.lives_left} ${result.lives_left > 1 ? 'lives' : 'life'} left. Try again!</p>`;
+                   <p>Score: ${result.score}/${result.total}</p>
+                   <p>You have ${result.lives_left} ${result.lives_left > 1 ? 'tries' : 'try'} left. Try again!</p>`;
     }
+
     DOM.quizResultEl.innerHTML = message;
+
+    // Special handling for game over outside of the quiz modal
+    if (result.game_over) {
+        closeQuizModal();
+        showGameOverModal(message); // Pass the detailed results to the game over modal
+        return;
+    }
 }
 
+
 /**
- * Shows the 'Game Over' modal.
+ * Shows the 'Game Over' modal, optionally with detailed results.
+ * @param {string} [detailsHtml] - Optional HTML string with detailed results to display.
  */
-export function showGameOverModal() {
+export function showGameOverModal(detailsHtml = '') {
+    const modalContent = DOM.gameOverModal.querySelector('.modal-content');
+    modalContent.innerHTML = ''; // Clear previous content
+
+    const title = document.createElement('h2');
+    title.textContent = 'Game Over';
+
+    const text = document.createElement('p');
+    text.textContent = "You've run out of tries on this quest! Don't worry, a true hero gets back up. You can try this quest again with a new set of questions.";
+
+    const art = document.createElement('p');
+    art.className = 'game-over-art';
+    art.textContent = '💀';
+
+    modalContent.appendChild(title);
+    modalContent.appendChild(text);
+
+    if (detailsHtml) {
+        const detailsContainer = document.createElement('div');
+        detailsContainer.className = 'game-over-details';
+        detailsContainer.innerHTML = detailsHtml;
+        modalContent.appendChild(detailsContainer);
+    }
+
+    modalContent.appendChild(art);
+    modalContent.appendChild(DOM.restartGameBtn);
+    
     DOM.gameOverModal.classList.remove('hidden');
     document.body.classList.add('modal-open');
+}
+
+
+/**
+ * Closes the game over modal and restores background scrolling.
+ */
+export function closeGameOverModal() {
+    DOM.gameOverModal.classList.add('hidden');
+    document.body.classList.remove('modal-open');
 }
 
 /**

@@ -52,6 +52,16 @@ body {
     padding-bottom: 1rem;
 }
 
+.app-header h1 {
+    margin-bottom: 0.25rem; /* Reduces space below the main title */
+}
+
+.app-header p {
+    margin-top: 0; /* Ensures no extra space above the subtitle */
+    font-size: 1rem;
+    color: var(--secondary-color);
+}
+
 h1, h2, h3 {
     font-family: var(--font-display);
     color: var(--primary-color);

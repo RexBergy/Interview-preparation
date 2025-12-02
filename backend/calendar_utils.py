@@ -195,7 +195,7 @@ def _create_calendar_event(task: Any, start_dt: datetime, end_dt: datetime):
     """Creates a new event in the primary Google Calendar."""
     event_body = {
         "summary": f"⚔️ Quest: {task.name}",
-        "description": f"{task.description}\n\nXP Reward: {100 + task.duration // 2}",
+        "description": f"{task.description}",
         "start": {"dateTime": start_dt.isoformat()},
         "end": {"dateTime": end_dt.isoformat()},
     }

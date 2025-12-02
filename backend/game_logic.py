@@ -78,7 +78,7 @@ def render_quest_board(game_tasks: List[Dict[str, Any]]) -> pd.DataFrame:
         status_map = {"COMPLETED": "✅ DONE", "UNLOCKED": "⚔️ UNLOCKED", "LOCKED": "🔒 LOCKED"}
         status_icon = status_map.get(task['status'], task['status'])
         
-        name = f"💀 {task['name'].upper()}" if task['type'] == "BOSS BATTLE" else task['name']
+        name = task['name']
 
         board_data.append([
             status_icon,

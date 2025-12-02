@@ -26,6 +26,7 @@ import {
   closeQuizModal,
   displayQuizResult,
   showQuizLoading,
+  closeGameOverModal,
   openTrainingModal,
   closeTrainingModal,
 } from './ui.js';
@@ -72,14 +73,43 @@ document.addEventListener('DOMContentLoaded', () => {
     DOM.nextBtn.style.display = currentPage < totalPages ? 'block' : 'none';
   };
 
+  const validatePage = (page) => {
+    // Find the container for the current page
+    const pageContainer = Array.from(DOM.formPages).find(p => parseInt(p.dataset.page, 10) === page);
+    if (!pageContainer) {
+      console.error(`Validation failed: Page container for page ${page} not found.`);
+      return false; // Should not happen
+    }
+  
+    const requiredInputs = pageContainer.querySelectorAll('[required]');
+  
+    for (const input of requiredInputs) {
+      // Check if the input value is empty
+      if (!input.value.trim()) {
+        // Find the corresponding label for a better error message
+        const label = input.closest('.form-group')?.querySelector('label');
+        const inputName = label ? label.textContent : 'A required field';
+        
+        // Alert the user and focus the invalid field
+        alert(`'${inputName}' is required before continuing.`);
+        input.focus();
+        
+        return false; // Validation failed
+      }
+    }
+  
+    return true; // All required inputs on the current page are valid
+  };
   DOM.nextBtn.addEventListener('click', () => {
-    console.log('Next button clicked. Current page before:', currentPage);
+    // Validate the current page before proceeding
+    if (!validatePage(currentPage)) {
+      return; // Stop if validation fails
+    }
+  
+    // Proceed to the next page if validation is successful
     if (currentPage < totalPages) {
       currentPage++;
       updateFormPage();
-      console.log('Current page after:', currentPage);
-    } else {
-      console.log('Already on the last page.');
     }
   });
 
@@ -271,11 +301,12 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /**
-   * Handles the "Restart" button in the game over modal, simply reloading the page
-   * to start a fresh session.
+   * Handles the "Try Again" button in the game over modal.
+   * It closes the modal and re-renders the game board, allowing the user to attempt the quest again.
    */
-  DOM.restartGameBtn.addEventListener('click', () => {
-    window.location.reload();
+  DOM.restartGameBtn.addEventListener('click', async () => {
+    closeGameOverModal();
+    await loadAndRenderGameBoard();
   });
 
   /**
