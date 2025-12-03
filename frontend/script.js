@@ -24,7 +24,9 @@ import {
   loadAndRenderGameBoard,
   openQuizModal,
   closeQuizModal,
-  displayQuizResult,
+  renderQuizResult,
+  openQuizResultModal,
+  closeQuizResultModal,
   showQuizLoading,
   closeGameOverModal,
   openTrainingModal,
@@ -246,12 +248,15 @@ document.addEventListener('DOMContentLoaded', () => {
    */
   DOM.quizForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    showQuizLoading(true);
     const formData = new FormData(DOM.quizForm);
     const answers = Array.from(formData.values());
     
     console.log('Quiz form submitted. Calling submitQuiz with answers:', answers);
     try {
       const result = await submitQuiz(answers);
+      closeQuizModal();
+      
       if (result.lives_left <= 0) {
         // Clear the frontend cache for this quiz to force regeneration
         if (appState.activeTaskIndex !== null) {
@@ -261,7 +266,9 @@ document.addEventListener('DOMContentLoaded', () => {
           console.log('After deletion:', JSON.parse(JSON.stringify(appState.preloadedQuizzes)));
         }
       }
-      displayQuizResult(result); // Show the outcome to the user.
+
+      const resultHTML = renderQuizResult(result); // Show the outcome to the user.
+      openQuizResultModal(resultHTML);
     } catch (error) {
       alert(error.message);
     }
@@ -310,6 +317,13 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(error => console.error(`Error pre-fetching next training for quest "${nextActiveQuest['Quest Objective']}":`, error));
         }
       }
+    }
+  });
+
+  DOM.quizResultModal.addEventListener('click', async (e) => {
+    if (e.target.id === 'close-quiz-result-btn') {
+      closeQuizResultModal();
+      await loadAndRenderGameBoard();
     }
   });
 

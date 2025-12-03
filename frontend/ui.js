@@ -38,6 +38,8 @@ export const DOM = {
   quizResultEl: document.getElementById('quiz-result'),
   quizLoading: document.getElementById('quiz-loading'),
   closeQuizBtn: document.getElementById('close-quiz-btn'),
+  quizResultModal: document.getElementById('quiz-result-modal'),
+  quizResultContent: document.getElementById('quiz-result-content'),
   gameOverModal: document.getElementById('game-over-modal'),
   restartGameBtn: document.getElementById('restart-game-btn'),
   trainingModal: document.getElementById('training-modal'),
@@ -272,10 +274,11 @@ export function openQuizModal(quizData) {
     showQuizLoading(true);
     DOM.quizModal.classList.remove('hidden');
     document.body.classList.add('modal-open');
+    DOM.quizQuestionsContainer.innerHTML = ''; // Clear previous questions
+    DOM.quizQuestionsContainer.scrollTop = 0; // Reset scroll position
 
     if (quizData) {
         DOM.quizTitle.textContent = `${quizData.task_name}`;
-        DOM.quizQuestionsContainer.innerHTML = ''; // Clear previous questions
         quizData.questions.forEach((q, i) => {
             const questionDiv = document.createElement('div');
             questionDiv.className = 'quiz-question';
@@ -299,6 +302,7 @@ export function openQuizModal(quizData) {
     // Reset modal state
     DOM.quizResultEl.classList.add('hidden');
     DOM.closeQuizBtn.classList.add('hidden');
+    DOM.quizForm.querySelector('button[type="submit"]').classList.toggle('hidden', !quizData);
 }
 
 /**
@@ -310,7 +314,25 @@ export function closeQuizModal() {
 }
 
 /**
- * Displays the final result of the submitted quiz.
+ * Opens the quiz result modal and displays the final result of the submitted quiz.
+ * @param {string} resultHTML - The HTML content of the quiz result.
+ */
+export function openQuizResultModal(resultHTML) {
+    DOM.quizResultContent.innerHTML = resultHTML;
+    DOM.quizResultModal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+}
+
+/**
+ * Closes the quiz result modal and restores background scrolling.
+ */
+export function closeQuizResultModal() {
+    DOM.quizResultModal.classList.add('hidden');
+    document.body.classList.remove('modal-open');
+}
+
+/**
+ * Renders the final result of the submitted quiz as an HTML string.
  * Handles UI changes for pass, fail, and game-over scenarios.
  * @param {object} result - The quiz result data from the server.
  * @param {boolean} result.passed - Whether the user passed the quiz.
@@ -318,56 +340,59 @@ export function closeQuizModal() {
  * @param {number} result.total - The total number of questions.
  * @param {boolean} [result.game_over] - Optional flag indicating if the game is over.
  * @param {number} [result.lives_left] - Optional count of remaining lives.
+ * @returns {string} The HTML string for the quiz result.
  */
-export function displayQuizResult(result) {
-    DOM.quizForm.classList.add('hidden');
-    DOM.quizResultEl.classList.remove('hidden');
-    DOM.closeQuizBtn.classList.remove('hidden');
-
+export function renderQuizResult(result) {
     let message = '';
     if (result.passed || result.lives_left <= 0) {
-        DOM.quizResultEl.className = result.passed ? 'result-success' : 'result-fail';
-        
         const title = result.passed
             ? `<h3>🎉 Success! Task Complete! 🎉</h3>`
-            : `<h3>Failure ...</h3>`;
+            : `<h3>💔 Failure... Review Your Answers</h3>`;
         
-        const score = `<p>Final Score: ${result.score}/${result.total}</p><p>You can try this task again with a new set of questions.</p>`;
+        const score = `<p>Final Score: ${result.score}/${result.total}</p>`;
+        
+        const advice = result.passed
+            ? `<p class="result-advice">Nicely done! You've mastered this topic.</p>`
+            : `<p class="result-advice">You've run out of tries. Review the answers below and try again with a new set of questions.</p>`;
 
         const answersHTML = result.quiz_data.map((q, i) => {
             const userAnswer = DOM.quizForm.elements[`q${i}`].value;
             const correctAnswer = q.options[q.correct_index];
             const isCorrect = userAnswer === correctAnswer;
 
-            let answerDetail = '';
-            if (isCorrect) {
-                answerDetail = `<p class="correct-answer">Your answer: ${userAnswer}</p>`;
-            } else {
-                answerDetail = `
-                    <p class="wrong-answer"><strong>Your answer</strong>: ${userAnswer}</p>
-                    <p class="correct-answer"><strong>Correct answer</strong>: ${correctAnswer}</p>
-                `;
-            }
+            const answerClass = isCorrect ? 'user-answer-correct' : 'user-answer-wrong';
 
             return `
-                <div class="result-question">
-                    <p><strong>${i + 1}. ${q.q}</strong></p>
-                    ${answerDetail}
+                <div class="result-question ${isCorrect ? 'correct-border' : 'wrong-border'}">
+                    <p class="question-title"><strong>${i + 1}. ${q.q}</strong></p>
+                    <div class="answer-comparison">
+                        <p class="${answerClass}"><strong>Your answer:</strong> ${userAnswer}</p>
+                        ${!isCorrect ? `<p class="correct-answer-text"><strong>Correct answer:</strong> ${correctAnswer}</p>` : ''}
+                    </div>
                     <p class="justification"><strong>Justification:</strong> ${q.justification}</p>
                 </div>
             `;
         }).join('');
 
-        message = `${title}${score}<div class="results-breakdown">${answersHTML}</div>`;
+        message = `
+            <div class="result-header ${result.passed ? 'result-success' : 'result-fail'}">
+                ${title}
+                ${score}
+                ${advice}
+            </div>
+            <div class="results-breakdown">${answersHTML}</div>
+        `;
 
     } else { // Failed but has lives left
-        DOM.quizResultEl.className = 'result-fail';
-        message = `<h3>Incorrect</h3>
-                   <p>Score: ${result.score}/${result.total}</p>
-                   <p>You have ${result.lives_left} ${result.lives_left > 1 ? 'tries' : 'try'} left. Try again!</p>`;
+        message = `
+            <div class="result-header result-fail">
+                <h3>Incorrect... Try Again!</h3>
+                <p>Score: ${result.score}/${result.total}</p>
+                <p>You have ${result.lives_left} ${result.lives_left > 1 ? 'tries' : 'try'} left.</p>
+            </div>`;
     }
 
-    DOM.quizResultEl.innerHTML = message;
+    return message + '<button id="close-quiz-result-btn" class="secondary-btn">Return to Board</button>';
 }
 
 
