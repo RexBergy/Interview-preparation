@@ -332,7 +332,7 @@ export function displayQuizResult(result) {
             ? `<h3>🎉 Success! Task Complete! 🎉</h3>`
             : `<h3>Failure ...</h3>`;
         
-        const score = `<p>Final Score: ${result.score}/${result.total}</p><p>You can try this quest again with a new set of questions.</p>`;
+        const score = `<p>Final Score: ${result.score}/${result.total}</p><p>You can try this task again with a new set of questions.</p>`;
 
         const answersHTML = result.quiz_data.map((q, i) => {
             const userAnswer = DOM.quizForm.elements[`q${i}`].value;
@@ -344,8 +344,8 @@ export function displayQuizResult(result) {
                 answerDetail = `<p class="correct-answer">Your answer: ${userAnswer}</p>`;
             } else {
                 answerDetail = `
-                    <p class="wrong-answer">Your answer: ${userAnswer}</p>
-                    <p class="correct-answer">Correct answer: ${correctAnswer}</p>
+                    <p class="wrong-answer"><strong>Your answer</strong>: ${userAnswer}</p>
+                    <p class="correct-answer"><strong>Correct answer</strong>: ${correctAnswer}</p>
                 `;
             }
 
@@ -383,7 +383,7 @@ export function showGameOverModal(detailsHtml = '') {
     title.textContent = 'Results';
 
     const text = document.createElement('p');
-    text.textContent = "You've run out of tries on this task! Don't worry, a true hero gets back up. You can try this quest again with a new set of questions.";
+    text.textContent = "You've run out of tries on this task! Don't worry, a true hero gets back up. You can try this task again with a new set of questions.";
 
     const art = document.createElement('p');
     art.className = 'game-over-art';

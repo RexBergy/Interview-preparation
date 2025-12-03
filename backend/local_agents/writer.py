@@ -20,6 +20,7 @@ The candidate needs a structured plan that covers:
 2. Create a daily plan where every "Task" is a distinct "Quest".
 3. Keep task descriptions actionable and concise (10-20 words).
 4. ENSURE VARIETY:  Include a great variety of tasks depending on the context
+5. DO NOT INCLUDE "Quest" in the Quest title
 
 # OUTPUT FORMAT
 Create a plan in STRICT MARKDOWN format.
