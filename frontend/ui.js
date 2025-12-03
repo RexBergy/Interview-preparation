@@ -477,9 +477,13 @@ export function openTrainingModal(data) {
   resourcesHtml += '</ul>';
 
   DOM.trainingContent.innerHTML = `
-    <h3>Core Concepts</h3>
-    <p>${data.explanation}</p>
-    ${resourcesHtml}
+    <div class="training-section">
+      <h3>Core Concepts</h3>
+      <p>${data.explanation}</p>
+    </div>
+    <div class="training-section">
+      ${resourcesHtml}
+    </div>
   `;
 }
 
