@@ -49,6 +49,7 @@ def init_game_state(plan: CompletePlan) -> List[Dict[str, Any]]:
             "day": f"Day {day.day}",
             "name": task.name,
             "desc": task.description,
+            "duration": task.duration,
             # The first task is unlocked by default, the rest are locked.
             "status": "UNLOCKED" if task_id == 0 else "LOCKED",
             "xp_reward": xp_reward,
@@ -82,7 +83,7 @@ def render_quest_board(game_tasks: List[Dict[str, Any]]) -> pd.DataFrame:
 
         board_data.append([
             status_icon,
-            task['day'],
+            f"{task['day']} - {task['duration']} mins",
             name,
             f"+{task['xp_reward']} XP"
         ])

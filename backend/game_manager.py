@@ -19,7 +19,7 @@ from typing import Dict, Any, AsyncGenerator, List, Tuple
 import json
 import asyncio # Import asyncio
 
-from agents import Runner
+from agents import Runner, WebSearchTool
 from fastapi import HTTPException
 from openai.types.responses import ResponseTextDeltaEvent
 
@@ -28,7 +28,7 @@ from backend.game_logic import init_game_state, render_quest_board, calculate_pl
 from backend.local_agents.writer import writer_agent
 from backend.plan_parser import parse_markdown_to_plan
 from backend.quiz_engine import generate_quiz_for_task, QUIZ_PASS_THRESHOLD
-from backend.training_engine import generate_training_material
+from backend.training_engine import training_agent
 from backend.schemas import PlanRequest
 
 
@@ -55,7 +55,8 @@ class GameManager:
         self.role = ""
 
     async def generate_and_initialize_plan(
-        self, req: PlanRequest
+        self,
+        req: PlanRequest
     ) -> AsyncGenerator[str, None]:
         """
         Generates, parses, and initializes a new study plan.
@@ -143,10 +144,10 @@ class GameManager:
             idx = 0
             task = self.tasks[idx]
             try:
-                training_material = generate_training_material(
-                    task['name'],
-                    task['desc']
-                )
+                # Format the prompt for the training agent
+                prompt = training_agent.instructions.format(task_name=task['name'], task_desc=task['desc'])
+                result = await Runner.run(training_agent, prompt)
+                training_material = json.loads(result.final_output)
                 self.training_materials[idx] = training_material
                 yield self._sse_event("training_preloaded", {"task_index": idx, "status": "success"})
             except Exception as e:
@@ -269,10 +270,10 @@ class GameManager:
         if task_index not in self.training_materials:
             task = self.tasks[task_index]
             try:
-                training_material = generate_training_material(
-                    task['name'],
-                    task['desc']
-                )
+                # Format the prompt for the training agent
+                prompt = training_agent.instructions.format(task_name=task['name'], task_desc=task['desc'])
+                result = await Runner.run(training_agent, prompt)
+                training_material = json.loads(result.final_output)
                 self.training_materials[task_index] = training_material
                 print(f"Background: Training material for task index {task_index} preloaded successfully.")
             except Exception as e:

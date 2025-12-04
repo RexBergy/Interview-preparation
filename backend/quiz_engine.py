@@ -68,6 +68,12 @@ def generate_quiz_for_task(role: str, task_name: str, task_desc: str, difficulty
         data = json.loads(content)
         questions = data.get("questions", [])
         
+        # ADDED: Log the correct answers for debugging purposes.
+        for i, q in enumerate(questions):
+            options = ["a", "b", "c", "d"]
+            correct_option = options[q['correct_index']]
+            print(f"Q{i+1}: {correct_option}")
+        
         # Validate the structure of the returned questions.
         if not questions or not all("correct_index" in q for q in questions):
             raise ValueError("Invalid or incomplete JSON structure in AI response.")

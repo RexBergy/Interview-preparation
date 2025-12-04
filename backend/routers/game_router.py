@@ -7,6 +7,9 @@ This router provides endpoints for generating a study plan, getting the game sta
 starting a quiz, and submitting quiz answers.
 """
 
+import asyncio
+import json
+from agents import Runner, WebSearchTool
 from fastapi import APIRouter, Depends, Body, HTTPException
 from sse_starlette.sse import EventSourceResponse
 from fastapi.responses import JSONResponse
@@ -15,7 +18,7 @@ from backend.dependencies import get_game_manager
 from backend.game_manager import GameManager
 from backend.schemas import PlanRequest, QuizStartRequest, QuizSubmitRequest, TrainRequest
 
-from backend.training_engine import generate_training_material
+from backend.training_engine import training_agent
 
 
 # Create an API router for game-related endpoints.
@@ -107,7 +110,7 @@ def submit_quiz(req: QuizSubmitRequest, manager: GameManager = Depends(get_game_
 
 
 @router.post("/train", summary="Get Training Materials for a Task")
-def train(req: TrainRequest, manager: GameManager = Depends(get_game_manager)):
+async def train(req: TrainRequest, manager: GameManager = Depends(get_game_manager)):
     """
     Provides training materials for a specific task (quest).
 
@@ -136,7 +139,9 @@ def train(req: TrainRequest, manager: GameManager = Depends(get_game_manager)):
 
     # If not preloaded, generate training material on demand
     task = manager.tasks[task_index]
-    training_material = generate_training_material(task['name'], task['desc'])
+    prompt = training_agent.instructions.format(task_name=task['name'], task_desc=task['desc'])
+    result = await Runner.run(training_agent, prompt)
+    training_material = json.loads(result.final_output)
     manager.training_materials[task_index] = training_material # Cache it for future requests
     
     print(f"Returning newly generated training material for task {quest_name}")
