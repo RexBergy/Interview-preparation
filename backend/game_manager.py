@@ -335,9 +335,10 @@ class GameManager:
         - Logistics: {days_available} days available, {req.hours} hours/day.
         
         INSTRUCTIONS:
-        Write a gamified preparation plan. Create quests specific to the role of {req.role}.
-        If a job description is provided, tailor the quests to the requirements and responsibilities listed.
-        The quests should cover both general skills for the role and specific points from the job description.
+        Write a gamified preparation plan. The tasks names should be fun, creative, questlike. However, the tasks in of themselfves should be serious and challenging.
+        Create tasks specific to the role of {req.role}.
+        If a job description is provided, tailor the tasks to the requirements and responsibilities listed.
+        The tasks should cover general skills, general skills for the role and specific points from the job description.
         Format the output as a clean, structured markdown document.
         """
 
