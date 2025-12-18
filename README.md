@@ -68,4 +68,4 @@ The app will fill your calendar with tasks to do if you integrate with Google Ca
 You will receive a board filled with tasks for each day leading to the deadline. Each task has specific readings and a quiz.
 
 
-*Google Calendar integration requires you to setup a client_secret to enable OAUTH2. Look here for more details.
+*Google Calendar integration requires you to setup a client_secret.json at the root directory of the project to enable OAUTH2. Look here for more details https://developers.google.com/identity/protocols/oauth2
