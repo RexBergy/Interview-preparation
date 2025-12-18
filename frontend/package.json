@@ -1,0 +1,12 @@
+{
+  "name": "interview-quest-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for the Interview Quest application.",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "type": "module"
+}

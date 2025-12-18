@@ -1,0 +1,553 @@
+/* --- FONTS & THEME --- */
+:root {
+    --background-color: #1a1a1a;
+    --container-bg: #2a2a2a;
+    --text-color: #d2c8b4;
+    --primary-color: #a88d5f; /* Gold/Bronze */
+    --secondary-color: #8a8a8a;
+    --accent-color: #e0b45c; /* Brighter Gold */
+    --border-color: #444;
+    --success-color: #4a6b4d; /* Muted Green */
+    --error-color: #9e2a2b; /* Deep Red */
+
+    --font-body: 'Lora', serif;
+    --font-display: 'Cinzel', serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    font-family: var(--font-body);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    padding: 2rem;
+    background-image: url('https://www.transparenttextures.com/patterns/dark-matter.png');
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* --- GENERAL LAYOUT & TYPOGRAPHY --- */
+#app {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.app-header {
+    text-align: center;
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 1rem;
+}
+
+.app-header h1 {
+    margin-bottom: 0.25rem; /* Reduces space below the main title */
+}
+
+.app-header p {
+    margin-top: 0; /* Ensures no extra space above the subtitle */
+    font-size: 1rem;
+    color: var(--secondary-color);
+}
+
+h1, h2, h3 {
+    font-family: var(--font-display);
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+h1 { font-size: 2.5rem; text-shadow: 1px 1px 3px #000; }
+h2 { font-size: 2rem; }
+h3 {
+    font-size: 1.5rem;
+    color: var(--accent-color);
+}
+
+.intro-section {
+    background-color: var(--container-bg);
+    border: 2px ridge var(--border-color);
+    border-radius: 8px;
+    padding: 2rem;
+    margin-top: 1rem;
+}
+
+.intro-section h2 {
+    margin-bottom: 0.5rem;
+}
+
+.intro-section h3 {
+    margin-top: 1.5rem;
+}
+
+ol.steps {
+    list-style-position: inside;
+    margin-top: 1rem;
+    padding-left: 1rem;
+}
+
+ol.steps li {
+    margin-bottom: 0.5rem;
+}
+
+ol.steps li::marker {
+    font-family: var(--font-display);
+    color: var(--accent-color);
+}
+
+
+/* --- FORM STYLES (STEP 1) --- */
+#setup-step, #loading-step, #game-board-step, .modal-content {
+    background-color: var(--container-bg);
+    border: 2px ridge var(--border-color);
+    border-radius: 8px;
+    padding: 2rem;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+/* Make the first page form a single column */
+.form-page[data-page="1"] .form-grid {
+    grid-template-columns: 1fr;
+}
+
+/* Make the second and third page forms a single column */
+.form-page[data-page="2"] .form-grid,
+.form-page[data-page="3"] .form-grid {
+    grid-template-columns: 1fr;
+    justify-items: start; /* Center the items in the grid */
+}
+
+.form-page[data-page="2"] .form-group,
+.form-page[data-page="3"] .form-group {
+    width: 25%;
+    max-width: 500px; /* Max-width to ensure it doesn't get too large on big screens */
+}
+
+#role {
+    max-width: 30%; /* A bit more than 15% for better usability */
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.calendar-question h3,
+.calendar-question p {
+    text-align: center;
+}
+
+.schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+}
+
+.form-page {
+    margin-bottom: 2rem;
+}
+
+.form-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+}
+
+.calendar-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+label {
+    font-weight: 700;
+    margin-bottom: 0.75rem; /* Increased space below the label */
+    color: var(--secondary-color);
+    font-family: var(--font-display);
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+textarea,
+select {
+    background-color: #1a1a1a;
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 0.75rem;
+    font-family: var(--font-body);
+}
+
+.form-grid input,
+.form-grid textarea,
+.form-grid select {
+    width: 100%;
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 5px var(--primary-color);
+}
+
+.checkbox-group {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+button {
+    font-family: var(--font-display);
+    background: linear-gradient(to bottom, #b49b73 0%, #a88d5f 100%);
+    color: #fff;
+    border: 1px solid #7c6c4e;
+    padding: 1rem 2rem;
+    border-radius: 4px;
+    cursor: pointer;
+    text-transform: uppercase;
+    margin-top: 1.5rem;
+    /* width: 100%; */ /* Removed for more specific control */
+    transition: all 0.2s;
+    text-shadow: 1px 1px 2px #000;
+}
+
+/* Specific buttons that should be full-width */
+#generate-plan-btn,
+#quiz-form button[type="submit"],
+#restart-game-btn {
+    width: 100%;
+}
+
+
+button:hover {
+    background: linear-gradient(to bottom, #c1a87e 0%, #b49b73 100%);
+    box-shadow: 0 0 10px var(--accent-color);
+}
+
+button.secondary-btn {
+    background: linear-gradient(to bottom, #8a8a8a 0%, #6f6f6f 100%);
+    color: #ddd;
+    width: auto;
+}
+
+.calendar-actions button {
+    margin-top: 0;
+}
+
+/* Overrides for form navigation buttons for consistent sizing */
+#prev-btn, #next-btn {
+    width: auto;
+    padding: 0.5rem 1.5rem;
+    margin-top: 0;
+    font-size: 0.8rem;
+}
+
+#next-btn {
+    margin-left: auto;
+}
+
+
+
+button:disabled {
+    background: #555;
+    cursor: not-allowed;
+    box-shadow: none;
+    color: #888;
+}
+
+/* --- LOADING STEP --- */
+#loading-step { text-align: center; }
+.spinner {
+    border: 4px solid #ffffff20;
+    border-top: 4px solid var(--primary-color);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 1rem auto;
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+#plan-stream {
+    background-color: #111;
+    text-align: left;
+    padding: 1rem;
+    border-radius: 4px;
+    max-height: 300px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    font-size: 0.9rem;
+    border: 1px solid var(--border-color);
+}
+
+/* --- GAME BOARD & STATS --- */
+#quest-board-intro,
+#player-stats {
+    background: #222;
+    border: 2px ridge var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+#quest-board-intro {
+    margin-bottom: 4rem;
+}
+
+#player-stats {
+    margin-bottom: 2rem;
+}
+.progress-bar-container {
+    width: 100%;
+    background-color: #111;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    margin: 0.5rem 0;
+    position: relative;
+}
+.progress-bar {
+    height: 24px;
+    background: linear-gradient(to right, #a88d5f, #e0b45c);
+    border-radius: 3px;
+    transition: width 0.5s ease-in-out;
+}
+.progress-bar-text {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    color: #fff;
+    text-shadow: 1px 1px 2px #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    line-height: 24px;
+    font-weight: bold;
+}
+
+.table-container { overflow-x: auto; }
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+th {
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+    text-transform: uppercase;
+}
+
+/* --- MODAL STYLES --- */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+.modal-content {
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh; /* Increased from 80vh */
+    overflow-y: auto;
+    width: 90%;
+    max-width: 1000px; /* Increased from 600px */
+}
+
+#quiz-loading {
+    text-align: center;
+    padding: 2rem;
+}
+
+#quiz-form {
+    display: flex;
+    flex-direction: column;
+}
+
+#quiz-questions-container {
+    overflow-y: auto; /* Enable scrolling for questions */
+    padding-right: 10px; /* Add some padding for the scrollbar */
+}
+
+.quiz-question {
+    margin-bottom: 1.5rem;
+    border-left: 3px solid var(--primary-color);
+    padding-left: 1rem;
+}
+.quiz-question p { margin-bottom: 0.5rem; font-weight: bold; }
+.quiz-options label {
+    display: block;
+    background: #333;
+    padding: 0.75rem;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+.quiz-options label:hover {
+    background: #444;
+    border-color: var(--accent-color);
+}
+.quiz-options input { margin-right: 0.5rem; }
+
+#quiz-result {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border-radius: 4px;
+}
+.result-success { background-color: #4a6b4d40; border: 1px solid var(--success-color); }
+.result-fail { background-color: #9e2a2b40; border: 1px solid var(--error-color); }
+
+.hidden {
+    display: none;
+}
+
+.game-over-details {
+    display: none;
+}
+
+/* --- TRAINING MODAL --- */
+#training-modal .modal-content {
+    gap: 1.5rem;
+    max-width: 1200px; /* Even wider for training content */
+}
+
+#game-over-modal .modal-content {
+    max-width: 800px;
+}
+
+#training-modal a {
+    color: var(--accent-color);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+#training-modal a:hover {
+    color: var(--text-color);
+    text-decoration: underline;
+}
+
+#training-modal .training-section {
+    background-color: #1a1a1a; /* Darker background for contrast */
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+#training-modal h3 {
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    font-size: 1.6rem; /* Slightly larger */
+}
+
+#training-modal ul {
+    list-style: none;
+    padding: 0;
+}
+
+#training-modal li {
+    background-color: #2a2a2a;
+    border-left: 4px solid var(--primary-color);
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    transition: background-color 0.2s;
+}
+
+#training-modal li:hover {
+    background-color: #333;
+}
+
+/* --- QUIZ RESULT STYLES --- */
+.result-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.result-header h3 {
+    font-size: 2rem;
+}
+
+.result-advice {
+    font-size: 1.1rem;
+    color: var(--secondary-color);
+}
+
+.results-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.result-question {
+    background-color: #333;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left-width: 5px;
+    border-left-style: solid;
+}
+
+.correct-border {
+    border-left-color: var(--success-color);
+}
+
+.wrong-border {
+    border-left-color: var(--error-color);
+}
+
+.question-title {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    font-family: var(--font-display);
+}
+
+.answer-comparison {
+    margin-bottom: 1rem;
+    padding-left: 1rem;
+    border-left: 2px solid var(--border-color);
+}
+
+.user-answer-correct {
+    color: var(--success-color);
+    font-weight: bold;
+}
+
+.user-answer-wrong {
+    color: var(--error-color);
+    font-weight: bold;
+}
+
+.correct-answer-text {
+    color: var(--success-color);
+}
+
+.justification {
+    font-style: italic;
+    color: var(--secondary-color);
+}

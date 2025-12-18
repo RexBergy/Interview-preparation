@@ -1,0 +1,35 @@
+Insights from User Comments
+==============================
+
+Summary of Common Issues:
+- Page Not Found: 3 instance(s)
+- Too High-Level: 1 instance(s)
+- Incorrect Content: 1 instance(s)
+- Subscriber Only: 1 instance(s)
+
+==============================
+All Comments:
+
+- Topic: Graph Traversal (BFS, DFS)
+  Comment: Agent same link twice
+
+- Topic: HTTP/HTTPS
+  Comment: There was a missing web page
+
+- Topic: Unit Testing
+  Comment: Page not found error
+
+- Topic: CI/CD Pipelines
+  Comment: Too high level
+
+- Topic: SWOT Analysis
+  Comment: Page was not correct 
+
+- Topic: Financial Statements Analysis
+  Comment: Page not found error
+
+- Topic: SPIN Selling Technique
+  Comment: No pages found
+
+- Topic: Porter's Five Forces
+  Comment: There was a subscriber only page

@@ -1,0 +1,42 @@
+@startuml architecture
+!theme vibrant
+title Interview-Preparation Application Architecture
+
+package "Frontend" {
+  [UI JavaScript]
+}
+
+package "Backend (FastAPI)" {
+  [Router] as Router
+  [Manager] as Manager
+
+  package "Engines & Logic" {
+    [Logic]
+    [PlanParser]
+    [QuizEngine]
+    [TrainingEngine]
+    [WriterAgent]
+  }
+}
+
+cloud "External Services" {
+    [OpenAI API] as OpenAI
+    [Google Calendar]
+}
+
+' === Relationships ===
+[UI JavaScript] -down-> Router : HTTP API Calls
+
+Router ..> Manager : Uses Dependency Injection
+
+Manager --> Logic : Calculates Stats
+Manager --> PlanParser : Parses Markdown Plan
+Manager --> WriterAgent : Generates Plan
+Manager --> QuizEngine : Generates Quiz
+Manager --> TrainingEngine : Generates Training
+Manager --> [Google Calendar] : Syncs tasks
+
+WriterAgent ..> OpenAI : Generates text
+QuizEngine ..> OpenAI : Generates questions
+TrainingEngine ..> OpenAI : Generates explanations
+@enduml
