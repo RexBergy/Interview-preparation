@@ -25,7 +25,6 @@ from backend.plan_parser import CompletePlan
 # --- Configuration ---
 
 # This environment variable is used for local development to bypass the HTTPS requirement.
-# It should NOT be set in a production environment.
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 # The path to the client secrets file obtained from the Google API Console.

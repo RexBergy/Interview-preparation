@@ -4,7 +4,7 @@
  * @file Manages all API interactions for the Interview Quest application.
  * This module abstracts the logic for making network requests to the backend server,
  * handling data fetching, and error management in a centralized location.
- * @author Gemini
+ * API requests for the frontend.
  */
 
 /**

@@ -26,9 +26,9 @@ from openai.types.responses import ResponseTextDeltaEvent
 from backend.calendar_utils import smart_schedule_quests, request_calendar_service
 from backend.game_logic import init_game_state, render_quest_board, calculate_player_stats
 from backend.local_agents.writer import writer_agent
-from backend.plan_parser import parse_markdown_to_plan
+from backend.plan_parser import parse_markdown_to_plan, parse_markdown_to_training_material
 from backend.quiz_engine import generate_quiz_for_task, QUIZ_PASS_THRESHOLD
-from backend.training_engine import training_agent
+from backend.training_engine import training_writer_agent
 from backend.schemas import PlanRequest
 
 
@@ -145,9 +145,9 @@ class GameManager:
             task = self.tasks[idx]
             try:
                 # Format the prompt for the training agent
-                prompt = training_agent.instructions.format(task_name=task['name'], task_desc=task['desc'])
-                result = await Runner.run(training_agent, prompt)
-                training_material = json.loads(result.final_output)
+                prompt = training_writer_agent.instructions.format(task_name=task['name'], task_desc=task['desc'])
+                result = await Runner.run(training_writer_agent, prompt)
+                training_material = parse_markdown_to_training_material(result.final_output)
                 self.training_materials[idx] = training_material
                 yield self._sse_event("training_preloaded", {"task_index": idx, "status": "success"})
             except Exception as e:
@@ -183,6 +183,33 @@ class GameManager:
             },
             "role": self.role,
         }
+
+    async def get_training_materials(self, task_index: int) -> Dict[str, Any]:
+        """
+        Retrieves training materials for a given task, generating them if they don't exist.
+
+        Args:
+            task_index: The index of the task to get training materials for.
+
+        Returns:
+            A dictionary containing the training materials.
+        """
+        if task_index >= len(self.tasks):
+            raise ValueError(f"Task index {task_index} is out of bounds.")
+
+        if task_index not in self.training_materials:
+            task = self.tasks[task_index]
+            try:
+                # Format the prompt for the training agent
+                prompt = training_writer_agent.instructions.format(task_name=task['name'], task_desc=task['desc'])
+                result = await Runner.run(training_writer_agent, prompt)
+                training_material = parse_markdown_to_training_material(result.final_output)
+                self.training_materials[task_index] = training_material
+                print(f"Training material for task index {task_index} generated on demand.")
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=f"Failed to generate training material for task {task_index}: {e}")
+
+        return self.training_materials[task_index]
 
     async def start_new_quiz(self, task_index: int, role: str) -> Dict[str, Any]:
         """
@@ -271,9 +298,9 @@ class GameManager:
             task = self.tasks[task_index]
             try:
                 # Format the prompt for the training agent
-                prompt = training_agent.instructions.format(task_name=task['name'], task_desc=task['desc'])
-                result = await Runner.run(training_agent, prompt)
-                training_material = json.loads(result.final_output)
+                prompt = training_writer_agent.instructions.format(task_name=task['name'], task_desc=task['desc'])
+                result = await Runner.run(training_writer_agent, prompt)
+                training_material = parse_markdown_to_training_material(result.final_output)
                 self.training_materials[task_index] = training_material
                 print(f"Background: Training material for task index {task_index} preloaded successfully.")
             except Exception as e:

@@ -444,7 +444,7 @@ export function closeGameOverModal() {
  * Opens and populates the training modal with learning resources.
  * @param {object} [data] - Optional training data from the server. If not provided, a loading message is displayed.
  * @param {string} [data.explanation] - A text explanation of the topic.
- * @param {Array<string>} [data.resources] - A list of resource URLs.
+ * @param {Array<object>} [data.resources] - A list of resource objects.
  */
 export function openTrainingModal(data) {
   DOM.trainingModal.classList.remove('hidden');
@@ -455,7 +455,7 @@ export function openTrainingModal(data) {
   if (!data) {
     DOM.trainingContent.innerHTML = `
       <div class="loading-spinner-container">
-        <div class="loading-spinner"></div>
+        <div class="spinner"></div>
         <p>Loading training materials...</p>
       </div>
     `;
@@ -464,10 +464,10 @@ export function openTrainingModal(data) {
 
   let resourcesHtml = '<h3>Recommended Resources</h3><ul>';
   if (data.resources && data.resources.length > 0) {
-    data.resources.forEach(url => {
+    data.resources.forEach(resource => {
       resourcesHtml += `
         <li>
-          <a href="${url}" target="_blank">${url}</a>
+          <a href="${resource.url}" target="_blank">${resource.url}</a> (${resource.estimated_reading_time_minutes} mins)
         </li>
       `;
     });
@@ -479,7 +479,7 @@ export function openTrainingModal(data) {
   DOM.trainingContent.innerHTML = `
     <div class="training-section">
       <h3>Core Concepts</h3>
-      <p>${data.explanation}</p>
+      <p>${data.explanation.replace(/\n/g, '<br>')}</p>
     </div>
     <div class="training-section">
       ${resourcesHtml}

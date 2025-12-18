@@ -18,9 +18,6 @@ from backend.dependencies import get_game_manager
 from backend.game_manager import GameManager
 from backend.schemas import PlanRequest, QuizStartRequest, QuizSubmitRequest, TrainRequest
 
-from backend.training_engine import training_agent
-
-
 # Create an API router for game-related endpoints.
 router = APIRouter()
 
@@ -132,17 +129,5 @@ async def train(req: TrainRequest, manager: GameManager = Depends(get_game_manag
     if task_index is None:
         raise HTTPException(status_code=404, detail=f"Task '{quest_name}' not found.")
 
-    # Check if training material is already preloaded
-    if task_index in manager.training_materials:
-        print(f"Returning preloaded training material for task {quest_name}")
-        return manager.training_materials[task_index]
-
-    # If not preloaded, generate training material on demand
-    task = manager.tasks[task_index]
-    prompt = training_agent.instructions.format(task_name=task['name'], task_desc=task['desc'])
-    result = await Runner.run(training_agent, prompt)
-    training_material = json.loads(result.final_output)
-    manager.training_materials[task_index] = training_material # Cache it for future requests
-    
-    print(f"Returning newly generated training material for task {quest_name}")
+    training_material = await manager.get_training_materials(task_index)
     return training_material

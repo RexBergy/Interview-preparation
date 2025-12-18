@@ -43,14 +43,11 @@ async def read_root():
         return HTMLResponse(content=f.read())
 
 
-# Include the API routers that define the application's endpoints.
 app.include_router(game_router.router, prefix="/api", tags=["Game"])
 app.include_router(calendar_router.router, prefix="/api", tags=["Calendar"])
 
-# The following block allows running the app directly with uvicorn for development.
 if __name__ == "__main__":
     import uvicorn
 
-    # Note: In a production deployment, you would typically use a production-grade
-    # ASGI server like Gunicorn with Uvicorn workers.
+ 
     uvicorn.run(app, host="localhost", port=8080)

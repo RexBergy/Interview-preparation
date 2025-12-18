@@ -1,0 +1,799 @@
+[
+  {
+    "topic": "Big O Notation",
+    "explanation": "Big O Notation is a mathematical concept used to describe the performance or efficiency of an algorithm, particularly in terms of time complexity (how the runtime grows with the input size) and space complexity (how the memory usage grows with the input size). It helps in assessing the scalability of an algorithm by expressing its worst-case or upper bound performance. Common Big O notations include O(1) for constant time, O(n) for linear time, and O(n^2) for quadratic time, among others.",
+    "resources": [
+      {
+        "url": "https://www.geeksforgeeks.org/analysis-of-algorithms-set-3asymptotic-notations/",
+        "estimated_reading_time_minutes": 15,
+        "user_estimated_time_minutes": 15
+      },
+      {
+        "url": "https://www.freecodecamp.org/news/time-complexity-of-algorithms/",
+        "estimated_reading_time_minutes": 10,
+        "user_estimated_time_minutes": 10
+      }
+    ],
+    "quality_rating": 5,
+    "usefulness_rating": 5,
+    "comments": ""
+  },
+  {
+    "topic": "Sorting Algorithms",
+    "explanation": "Sorting algorithms are techniques used to arrange data in a particular order. Common sorting algorithms include Quicksort, Mergesort, and Heapsort. Quicksort efficiently sorts data by dividing it into smaller sub-arrays. Mergesort uses a divide-and-conquer approach to break down data into single elements and merges them in order. Heapsort, based on the heap data structure, continuously extracts the maximum element to sort the data. These algorithms differ in time complexity and suitability for various data types and sizes.",
+    "resources": [
+      {
+        "url": "https://www.geeksforgeeks.org/sorting-algorithms/",
+        "estimated_reading_time_minutes": 20,
+        "user_estimated_time_minutes": 240
+      },
+      {
+        "url": "https://www.tutorialspoint.com/data_structures_algorithms/sorting_algorithms.htm",
+        "estimated_reading_time_minutes": 15,
+        "user_estimated_time_minutes": 13
+      }
+    ],
+    "quality_rating": 4,
+    "usefulness_rating": 4,
+    "comments": ""
+  },
+  {
+    "topic": "Graph Traversal (BFS, DFS)",
+    "explanation": "Graph traversal refers to the process of visiting all the nodes and edges of a graph. Two common methods are Breadth-First Search (BFS) and Depth-First Search (DFS). BFS explores neighbors of a node before moving to the next level, using a queue to track nodes. DFS, on the other hand, explores as far as possible down a branch before backtracking, typically using a stack or recursion.",
+    "resources": [
+      {
+        "url": "https://www.geeksforgeeks.org/graph-and-its-representations/",
+        "estimated_reading_time_minutes": 15,
+        "user_estimated_time_minutes": 15
+      },
+      {
+        "url": "https://www.geeksforgeeks.org/breadth-first-search-or-bfs-for-a-graph/",
+        "estimated_reading_time_minutes": 10,
+        "user_estimated_time_minutes": 10
+      },
+      {
+        "url": "https://www.geeksforgeeks.org/depth-first-search-or-dfs-for-a-graph/",
+        "estimated_reading_time_minutes": 10,
+        "user_estimated_time_minutes": 10
+      }
+    ],
+    "quality_rating": 5,
+    "usefulness_rating": 5,
+    "comments": "Agent same link twice"
+  },
+  {
+    "topic": "Dynamic Programming",
+    "explanation": "Dynamic Programming (DP) is an algorithmic technique that optimizes complex problems by breaking them into simpler, overlapping subproblems and storing their solutions. By reusing these stored results, it avoids redundant computation and often reduces exponential time complexities to polynomial. DP requires two key properties: overlapping subproblems and optimal substructure. Solutions can be implemented in two primary ways: memoization (top\u2011down recursion with caching) or tabulation (bottom\u2011up iterative DP table).",
+    "resources": [
+      {
+        "url": "https://www.geeksforgeeks.org/dynamic-programming/",
+        "estimated_reading_time_minutes": 10,
+        "user_estimated_time_minutes": 240
+      },
+      {
+        "url": "https://www.techinterviewhandbook.org/algorithms/dynamic-programming/",
+        "estimated_reading_time_minutes": 8,
+        "user_estimated_time_minutes": 5
+      }
+    ],
+    "quality_rating": 4,
+    "usefulness_rating": 3,
+    "comments": ""
+  },
+  {
+    "topic": "Hash Tables",
+    "explanation": "A hash table (also known as a hash map or dictionary) is a data structure that maps keys to values by computing a numeric index via a hash function and storing the value in an array at that index. The average time complexity for insertion, lookup, and deletion is O(1), though in the worst case it degrades to O(n), typically due to collisions. Collisions occur when multiple keys hash to the same index, and they are resolved using strategies like:\n\n\u2022 Separate chaining \u2014 storing colliding elements in a linked list (or similar collection) at each bucket\n\u2022 Open addressing \u2014 probing for alternative free slots using methods such as linear probing, quadratic probing, or double hashing\n\nThe efficiency of a hash table also depends on the load factor (ratio of stored items to table size). Maintaining a load factor below certain thresholds helps preserve performance; beyond that, resizing (rehashing) is required to avoid degradation.",
+    "resources": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Hash_table",
+        "estimated_reading_time_minutes": 10,
+        "user_estimated_time_minutes": 60
+      },
+      {
+        "url": "https://www.geeksforgeeks.org/dsa/collision-resolution-techniques/",
+        "estimated_reading_time_minutes": 8,
+        "user_estimated_time_minutes": 10
+      }
+    ],
+    "quality_rating": 5,
+    "usefulness_rating": 4,
+    "comments": ""
+  },
+  {
+    "topic": "REST APIs",
+    "explanation": "REST APIs (Representational State Transfer Application Programming Interfaces) are web services that adhere to specific principles such as statelessness, client-server architecture, cacheability, layered system, code on demand, and uniform interface. They utilize HTTP protocols for communication between the client and server, using standard HTTP methods like GET, POST, PUT, and DELETE. Best practices include using proper HTTP methods, managing authentication, handling errors gracefully, and ensuring consistency in responses.",
+    "resources": [
+      {
+        "url": "https://restfulapi.net/",
+        "estimated_reading_time_minutes": 20,
+        "user_estimated_time_minutes": 25
+      },
+      {
+        "url": "https://www.smashingmagazine.com/2018/01/understanding-using-rest-api/",
+        "estimated_reading_time_minutes": 15,
+        "user_estimated_time_minutes": 30
+      }
+    ],
+    "quality_rating": 4,
+    "usefulness_rating": 5,
+    "comments": ""
+  },
+  {
+    "topic": "Load Balancing",
+    "explanation": "Load balancing is the process of distributing incoming network or application traffic across multiple servers. This strategy ensures no single server becomes overwhelmed, improving application responsiveness and availability. Load balancers can be hardware-based or software-based, and they use algorithms like round-robin, least connections, or IP hash to intelligently route traffic to optimize resource use and minimize latency.",
+    "resources": [
+      {
+        "url": "https://www.nginx.com/resources/glossary/load-balancing/",
+        "estimated_reading_time_minutes": 10,
+        "user_estimated_time_minutes": 30
+      },
+      {
+        "url": "https://aws.amazon.com/what-is/load-balancing/",
+        "estimated_reading_time_minutes": 8,
+        "user_estimated_time_minutes": 25
+      },
+      {
+        "url": "https://www.cloudflare.com/learning/cdn/glossary/load-balancing/",
+        "estimated_reading_time_minutes": 12,
+        "user_estimated_time_minutes": 20
+      }
+    ],
+    "quality_rating": 5,
+    "usefulness_rating": 5,
+    "comments": ""
+  },
+  {
+    "topic": "Database Sharding",
+    "explanation": "Database sharding is a technique used to improve the scalability and performance of a database by distributing data across multiple database instances. It involves horizontally partitioning a database, dividing it into smaller, more manageable pieces, known as shards. Each shard is stored on a separate database server, allowing for parallel processing and reducing the load on any single database server. Sharding is especially useful for handling large volumes of data and can be customized based on specific criteria, such as user ID or geographic location.",
+    "resources": [
+      {
+        "url": "https://www.digitalocean.com/community/tutorials/understanding-database-sharding",
+        "estimated_reading_time_minutes": 15,
+        "user_estimated_time_minutes": 30
+      },
+      {
+        "url": "https://medium.com/@jeeyoungk/how-sharding-works-b4dec46b3f6",
+        "estimated_reading_time_minutes": 10,
+        "user_estimated_time_minutes": 25
+      }
+    ],
+    "quality_rating": 5,
+    "usefulness_rating": 5,
+    "comments": ""
+  },
+  {
+    "topic": "Caching Strategies",
+    "explanation": "Caching strategies are techniques used to improve application performance and scalability by managing how data is stored and retrieved between a fast cache layer and a slower primary datastore. Key strategies include:\n\u2022 Cache\u2011Aside (Lazy Loading): Application checks the cache first, on a miss it retrieves data from the datastore and populates the cache. It\u2019s simple and ideal for read\u2011heavy workloads.\n\u2022 Read\u2011Through: The cache sits between the application and the datastore and automatically fetches and caches missing data, simplifying read logic and optimizing for frequent reads.\n\u2022 Write\u2011Through: Writes go to both cache and datastore synchronously, ensuring strong consistency at the cost of slower writes.\n\u2022 Write\u2011Back (Write\u2011Behind): Writes initially go only to cache and are asynchronously flushed to the datastore later. This boosts write performance but introduces complexity and eventual consistency.\nTrade\u2011offs center on latency, consistency, complexity, and potential data loss, making strategy choice context-dependent.",
+    "resources": [
+      {
+        "url": "https://officialcto.com/interview-section/hld/caching/strategies",
+        "estimated_reading_time_minutes": 10,
+        "user_estimated_time_minutes": 10
+      },
+      {
+        "url": "https://www.geeksforgeeks.org/dbms/what-is-caching-strategies-in-dbms/",
+        "estimated_reading_time_minutes": 12,
+        "user_estimated_time_minutes": 12
+      }
+    ],
+    "quality_rating": 5,
+    "usefulness_rating": 3,
+    "comments": ""
+  },
+  {
+    "topic": "SQL Joins",
+    "explanation": "SQL Joins are operations in relational databases that allow you to combine rows from two or more tables based on related columns. The most common types of joins include INNER JOIN, which returns only the rows with matching values in both tables; LEFT JOIN (or LEFT OUTER JOIN), which returns all rows from the left table and matched rows from the right table; RIGHT JOIN (or RIGHT OUTER JOIN), which returns all rows from the right table and matched rows from the left table; and FULL JOIN (or FULL OUTER JOIN), which returns all rows when there is a match in either table. Joins are essential for querying data across multiple tables efficiently.",
+    "resources": [
+      {
+        "url": "https://www.w3schools.com/sql/sql_join.asp",
+        "estimated_reading_time_minutes": 15,
+        "user_estimated_time_minutes": 5
+      },
+      {
+        "url": "https://www.sqlshack.com/sql-join-types-with-examples/",
+        "estimated_reading_time_minutes": 10,
+        "user_estimated_time_minutes": 0
+      }
+    ],
+    "quality_rating": 2,
+    "usefulness_rating": 2,
+    "comments": ""
+  },
+  {
+    "topic": "Database Indexing",
+    "explanation": "Database indexing is a technique that builds auxiliary data structures\u2014typically sorted trees like B\u2011trees or hash tables\u2014to map key values to their physical row locations. This lets the database quickly locate relevant rows without scanning the entire table. Indexes greatly improve query performance, especially for operations involving filters, joins, sorting, or range queries, by reducing disk I/O and leveraging efficient search algorithms. However, they consume extra storage space and incur maintenance overhead for write operations like inserts, updates, or deletes, so they should be used judiciously.",
+    "resources": [
+      {
+        "url": "https://www.atlassian.com/data/databases/how-does-indexing-work",
+        "estimated_reading_time_minutes": 6,
+        "user_estimated_time_minutes": 8
+      },
+      {
+        "url": "https://en.wikipedia.org/wiki/Database_index",
+        "estimated_reading_time_minutes": 8,
+        "user_estimated_time_minutes": 25
+      },
+      {
+        "url": "https://www.geeksforgeeks.org/dbms/indexing-in-databases-set-1/",
+        "estimated_reading_time_minutes": 7,
+        "user_estimated_time_minutes": 15
+      }
+    ],
+    "quality_rating": 4,
+    "usefulness_rating": 5,
+    "comments": ""
+  },
+  {
+    "topic": "TCP/IP Model",
+    "explanation": "The TCP/IP model is a practical framework used for organizing how data is transmitted across networks. It typically consists of four or five layers\u2014Application, Transport, Internet (Network), Data Link, and Physical\u2014that each play a distinct role: the Application layer handles communication with user-facing software via protocols like HTTP or SMTP; the Transport layer (using TCP or UDP) ensures data is delivered reliably or quickly; the Internet layer routes packets across different networks using IP addressing; the Data Link and Physical layers manage the transmission of raw bits over hardware like Ethernet or Wi\u2011Fi. This layered approach simplifies design, enhances interoperability, and mirrors how the Internet actually operates.",
+    "resources": [
+      {
+        "url": "https://www.geeksforgeeks.org/computer-networks/tcp-ip-model/",
+        "estimated_reading_time_minutes": 6,
+        "user_estimated_time_minutes": 15
+      },
+      {
+        "url": "https://www.techtarget.com/searchnetworking/definition/TCP-IP",
+        "estimated_reading_time_minutes": 8,
+        "user_estimated_time_minutes": 25
+      },
+      {
+        "url": "https://us.norton.com/blog/privacy/tcp-ip",
+        "estimated_reading_time_minutes": 5,
+        "user_estimated_time_minutes": 8
+      }
+    ],
+    "quality_rating": 5,
+    "usefulness_rating": 3,
+    "comments": ""
+  },
+  {
+    "topic": "HTTP/HTTPS",
+    "explanation": "HTTP (Hypertext Transfer Protocol) is the foundation of data communication on the web, allowing the transfer of information between a client (such as a web browser) and a server. HTTPS (HTTP Secure) is an extension of HTTP that uses TLS (Transport Layer Security) or SSL (Secure Sockets Layer) to encrypt data for secure communication. This encryption protects sensitive information from eavesdropping and tampering, ensuring data integrity and confidentiality.",
+    "resources": [
+      {
+        "url": "https://www.cloudflare.com/learning/ssl/what-is-https/",
+        "estimated_reading_time_minutes": 10,
+        "user_estimated_time_minutes": 10
+      },
+      {
+        "url": "https://developer.mozilla.org/en-US/docs/Web/HTTPS",
+        "estimated_reading_time_minutes": 15,
+        "user_estimated_time_minutes": 0
+      }
+    ],
+    "quality_rating": 2,
+    "usefulness_rating": 2,
+    "comments": "There was a missing web page"
+  },
+  {
+    "topic": "Git Basics",
+    "explanation": "Git is a distributed version control system commonly used in software development to track code changes and manage collaboration among multiple developers. Key Git commands include 'git init' to initialize a repository, 'git clone' to copy an existing repository, 'git add' to stage changes, 'git commit' to save changes, 'git push' to send changes to a remote repository, and 'git pull' to fetch and merge changes from a remote repository. Branching strategies, such as 'feature branching' and 'Git Flow', are employed to manage code changes across different development tasks and environments, allowing for parallel development and easier integration.",
+    "resources": [
+      {
+        "url": "https://git-scm.com/doc",
+        "estimated_reading_time_minutes": 20,
+        "user_estimated_time_minutes": 300
+      },
+      {
+        "url": "https://www.atlassian.com/git/tutorials/learn-git-with-bitbucket-cloud",
+        "estimated_reading_time_minutes": 15,
+        "user_estimated_time_minutes": 30
+      }
+    ],
+    "quality_rating": 3,
+    "usefulness_rating": 1,
+    "comments": ""
+  },
+  {
+    "topic": "Unit Testing",
+    "explanation": "Unit testing is a software testing method where individual units or components of a software are tested in isolation. The primary goal is to ensure that each part of the software works as intended. Well-written unit tests can significantly improve code quality by catching bugs early and serving as documentation for how the code is supposed to function. Writing unit tests typically involves using a testing framework to create test cases that assert the expected behavior of the code.",
+    "resources": [
+      {
+        "url": "https://www.guru99.com/unit-testing-guide.html",
+        "estimated_reading_time_minutes": 15,
+        "user_estimated_time_minutes": 18
+      },
+      {
+        "url": "https://www.freecodecamp.org/news/what-is-unit-testing-definition-types-tools-examples/",
+        "estimated_reading_time_minutes": 10,
+        "user_estimated_time_minutes": 0
+      }
+    ],
+    "quality_rating": 2,
+    "usefulness_rating": 1,
+    "comments": "Page not found error"
+  },
+  {
+    "topic": "CI/CD Pipelines",
+    "explanation": "CI/CD pipelines combine Continuous Integration (CI) and Continuous Delivery or Deployment (CD) to automate and streamline software delivery. CI ensures that developers\u2019 code changes are merged frequently and validated through automated builds and tests, catching issues early. CD then automates the process of packaging, staging, and releasing software\u2014either requiring human approval (delivery) or fully automatic (deployment). This automation accelerates release cycles, enhances quality, reduces errors, and enables rapid feedback and more reliable production updates.",
+    "resources": [
+      {
+        "url": "https://aws.amazon.com/what-is/ci-cd-pipeline/",
+        "estimated_reading_time_minutes": 5,
+        "user_estimated_time_minutes": 10
+      },
+      {
+        "url": "https://www.redhat.com/en/topics/devops/what-cicd-pipeline",
+        "estimated_reading_time_minutes": 5,
+        "user_estimated_time_minutes": 10
+      },
+      {
+        "url": "https://circleci.com/blog/what-is-a-ci-cd-pipeline/",
+        "estimated_reading_time_minutes": 4,
+        "user_estimated_time_minutes": 8
+      }
+    ],
+    "quality_rating": 2,
+    "usefulness_rating": 2,
+    "comments": "Too high level"
+  },
+  {
+    "topic": "Discounted Cash Flow (DCF) Analysis",
+    "explanation": "Discounted Cash Flow (DCF) Analysis is a valuation method that estimates the value of an investment based on its expected future cash flows. These cash flows are adjusted for the time value of money, reflecting the principle that money now is worth more than money in the future. By using a discount rate, DCF analysis helps determine the present value of anticipated cash flows, aiding in assessing the attractiveness of an investment.",
+    "resources": [
+      {
+        "url": "https://corporatefinanceinstitute.com/resources/knowledge/valuation/what-is-discounted-cash-flow-dcf/",
+        "estimated_reading_time_minutes": 20,
+        "user_estimated_time_minutes": 0
+      },
+      {
+        "url": "https://www.investopedia.com/terms/d/dcf.asp",
+        "estimated_reading_time_minutes": 15,
+        "user_estimated_time_minutes": 15
+      }
+    ],
+    "quality_rating": 5,
+    "usefulness_rating": 3,
+    "comments": ""
+  },
+  {
+    "topic": "SWOT Analysis",
+    "explanation": "SWOT Analysis is a strategic planning tool used to identify and evaluate the internal and external factors affecting an organization. Strengths and Weaknesses are internal factors that are within the organization's control, while Opportunities and Threats are external factors that may impact the organization but are beyond its control. This framework helps organizations understand their current position and develop strategies to achieve their objectives.",
+    "resources": [
+      {
+        "url": "https://www.mindtools.com/pages/article/newTMC_05.htm",
+        "estimated_reading_time_minutes": 15,
+        "user_estimated_time_minutes": 15
+      },
+      {
+        "url": "https://www.forbes.com/sites/carolinecastrillon/2019/03/31/how-to-conduct-a-personal-swot-analysis-for-a-career-change/",
+        "estimated_reading_time_minutes": 10,
+        "user_estimated_time_minutes": 300
+      }
+    ],
+    "quality_rating": 3,
+    "usefulness_rating": 1,
+    "comments": "Page was not correct "
+  },
+  {
+    "topic": "Return on Investment (ROI)",
+    "explanation": "Return on Investment (ROI) is a financial metric that expresses the profitability of an investment as a percentage. It\u2019s calculated by dividing net profit (or gain) by the initial investment cost, then multiplying by 100. ROI is useful for comparing investments regardless of scale, though it has limitations: it doesn\u2019t account for the investment\u2019s time horizon, risk, fees, or taxes, and can be misleading without context or supplementary analysis.",
+    "resources": [
+      {
+        "url": "https://www.britannica.com/money/return-on-investment",
+        "estimated_reading_time_minutes": 5,
+        "user_estimated_time_minutes": 20
+      },
+      {
+        "url": "https://www.fidelity.com/learning-center/trading-investing/ROI-return-on-investment",
+        "estimated_reading_time_minutes": 5,
+        "user_estimated_time_minutes": 10
+      },
+      {
+        "url": "https://www.investopedia.com/articles/basics/10/guide-to-calculating-roi.asp",
+        "estimated_reading_time_minutes": 10,
+        "user_estimated_time_minutes": 15
+      }
+    ],
+    "quality_rating": 4,
+    "usefulness_rating": 4,
+    "comments": ""
+  },
+  {
+    "topic": "Financial Statements Analysis",
+    "explanation": "Financial Statements Analysis involves examining an organization's financial statements to understand its financial health and performance. Key components include the balance sheet, which shows assets, liabilities, and equity; the income statement, which details revenue and expenses to reveal profit or loss; and the cash flow statement, which highlights the inflow and outflow of cash. Understanding these documents helps in assessing a company's profitability, liquidity, and solvency.",
+    "resources": [
+      {
+        "url": "https://www.investopedia.com/articles/01/110701.asp",
+        "estimated_reading_time_minutes": 20,
+        "user_estimated_time_minutes": 20
+      },
+      {
+        "url": "https://www.accountingtools.com/articles/how-to-read-financial-statements.html",
+        "estimated_reading_time_minutes": 15,
+        "user_estimated_time_minutes": 0
+      }
+    ],
+    "quality_rating": 3,
+    "usefulness_rating": 4,
+    "comments": "Page not found error"
+  },
+  {
+    "topic": "Supply and Demand Economics",
+    "explanation": "Supply and demand economics is a fundamental principle that describes how the quantity of a good or service available (supply) and the desire of consumers to buy it (demand) affects its price. When demand increases and supply remains unchanged, prices tend to rise. Conversely, if supply increases and demand remains unchanged, prices tend to fall. The equilibrium price is established at a point where the quantity demanded equals the quantity supplied.",
+    "resources": [
+      {
+        "url": "https://www.investopedia.com/terms/s/supply-and-demand.asp",
+        "estimated_reading_time_minutes": 15,
+        "user_estimated_time_minutes": 0
+      },
+      {
+        "url": "https://www.khanacademy.org/economics-finance-domain/microeconomics/supply-demand-equilibrium",
+        "estimated_reading_time_minutes": 10,
+        "user_estimated_time_minutes": 200
+      }
+    ],
+    "quality_rating": 2,
+    "usefulness_rating": 1,
+    "comments": ""
+  },
+  {
+    "topic": "Digital Marketing Funnel",
+    "explanation": "The Digital Marketing Funnel represents the journey a customer takes from the initial awareness of a product or service to the final purchase. It is often structured using models like AIDA, which stands for Awareness, Interest, Desire, and Action. The funnel helps marketers understand how to engage prospective customers at each stage, employing different strategies and tools to convert leads into customers.",
+    "resources": [
+      {
+        "url": "https://www.hubspot.com/inbound-marketing",
+        "estimated_reading_time_minutes": 20,
+        "user_estimated_time_minutes": 15
+      },
+      {
+        "url": "https://blog.hootsuite.com/digital-marketing-funnel/",
+        "estimated_reading_time_minutes": 12,
+        "user_estimated_time_minutes": 0
+      }
+    ],
+    "quality_rating": 3,
+    "usefulness_rating": 4,
+    "comments": ""
+  },
+  {
+    "topic": "Search Engine Optimization (SEO)",
+    "explanation": "Search Engine Optimization (SEO) is the practice of improving a website\u2019s visibility and organic (non-paid) traffic by optimizing its content, structure, and authority signals to align with how search engines crawl, index, and rank pages. Key components include: on\u2011page SEO (optimizing content, keywords, meta tags); off\u2011page SEO (earning backlinks and building brand signals); and technical SEO (ensuring site speed, mobile\u2011friendliness, secure connections, clear site architecture, and crawlability). A successful SEO strategy begins with understanding user intent, performing keyword research, creating high\u2011quality content, building authoritative links, and continuously auditing and refining performance.",
+    "resources": [
+      {
+        "url": "https://mozseoblog.com/beginners-guide-to-seo/",
+        "estimated_reading_time_minutes": 20,
+        "user_estimated_time_minutes": 20
+      },
+      {
+        "url": "https://aioseo.com/seo-tutorial/",
+        "estimated_reading_time_minutes": 15,
+        "user_estimated_time_minutes": 60
+      },
+      {
+        "url": "https://www.seo.com/resources/",
+        "estimated_reading_time_minutes": 25,
+        "user_estimated_time_minutes": 5
+      }
+    ],
+    "quality_rating": 4,
+    "usefulness_rating": 4,
+    "comments": ""
+  },
+  {
+    "topic": "Content Marketing Strategy",
+    "explanation": "Content marketing strategy is the intentional planning, creation, distribution, and governance of valuable content tailored to a specific audience. It involves defining clear goals, understanding the target audience through personas, choosing appropriate content types and distribution channels, establishing a content calendar, setting performance metrics, and continuously refining based on insights.",
+    "resources": [
+      {
+        "url": "https://business.adobe.com/blog/basics/learn-how-to-build-content-marketing-strategy-in-10-steps",
+        "estimated_reading_time_minutes": 10,
+        "user_estimated_time_minutes": 45
+      },
+      {
+        "url": "https://blog.hubspot.com/marketing/content-marketing-plan",
+        "estimated_reading_time_minutes": 12,
+        "user_estimated_time_minutes": 60
+      }
+    ],
+    "quality_rating": 5,
+    "usefulness_rating": 5,
+    "comments": ""
+  },
+  {
+    "topic": "SPIN Selling Technique",
+    "explanation": "SPIN Selling is a sales technique developed by Neil Rackham that focuses on using a structured questioning process to enhance sales effectiveness. It consists of four types of questions: Situation questions to gather background information, Problem questions to explore customer challenges, Implication questions to highlight the consequences of the problems, and Need-payoff questions to reveal the value of solving the problems. This technique is designed to lead the customer to self-discover the need for change, making it more effective in complex sales.",
+    "resources": [
+      {
+        "url": "https://www.forbes.com/sites/forbescoachescouncil/2019/01/30/how-spin-selling-can-help-your-sales-team-succeed/",
+        "estimated_reading_time_minutes": 8,
+        "user_estimated_time_minutes": 0
+      },
+      {
+        "url": "https://blog.hubspot.com/sales/spin-selling",
+        "estimated_reading_time_minutes": 12,
+        "user_estimated_time_minutes": 0
+      }
+    ],
+    "quality_rating": 1,
+    "usefulness_rating": 1,
+    "comments": "No pages found"
+  },
+  {
+    "topic": "Customer Relationship Management (CRM)",
+    "explanation": "Customer Relationship Management (CRM) involves strategies and technologies for managing a company's relationships and interactions with current and potential customers. The goal is to improve business relationships, streamline processes, and enhance customer service. Effective CRM systems gather customer data across different channels, offering insights that help build customer loyalty and drive sales growth.",
+    "resources": [
+      {
+        "url": "https://www.salesforce.com/what-is-crm/",
+        "estimated_reading_time_minutes": 12,
+        "user_estimated_time_minutes": 12
+      },
+      {
+        "url": "https://www.hubspot.com/crm",
+        "estimated_reading_time_minutes": 8,
+        "user_estimated_time_minutes": 3
+      },
+      {
+        "url": "https://www.forbes.com/sites/forbessmallbusiness/2020/03/11/what-is-customer-relationship-management-and-why-is-it-important/",
+        "estimated_reading_time_minutes": 15,
+        "user_estimated_time_minutes": 0
+      }
+    ],
+    "quality_rating": 3,
+    "usefulness_rating": 2,
+    "comments": ""
+  },
+  {
+    "topic": "HIPAA Compliance",
+    "explanation": "HIPAA Compliance refers to adhering to U.S. federal regulations that protect sensitive patient health information. Key elements include the Privacy Rule (restricts access and disclosure of Protected Health Information, or PHI), the Security Rule (mandates technical, administrative, and physical safeguards for electronic PHI), the Breach Notification Rule (requires reporting of breaches within defined timelines), and the Enforcement Rule (imposes penalties for non-compliance). Covered entities and their business associates must conduct regular risk assessments, implement safeguards like encryption and access controls, train staff, and maintain formal agreements (BAAs). Noncompliance can result in significant civil and criminal penalties.",
+    "resources": [
+      {
+        "url": "https://www.hhs.gov/hipaa/for-professionals/index.html",
+        "estimated_reading_time_minutes": 10,
+        "user_estimated_time_minutes": 180
+      },
+      {
+        "url": "https://www.hipaajournal.com/what-does-hipaa-compliance-mean/",
+        "estimated_reading_time_minutes": 12,
+        "user_estimated_time_minutes": 12
+      },
+      {
+        "url": "https://www.ncbi.nlm.nih.gov/books/NBK500019/",
+        "estimated_reading_time_minutes": 15,
+        "user_estimated_time_minutes": 60
+      }
+    ],
+    "quality_rating": 5,
+    "usefulness_rating": 4,
+    "comments": ""
+  },
+  {
+    "topic": "Clinical Trial Phases",
+    "explanation": "Clinical trial phases are the stages of research a new drug or medical device undergoes before approval. Phase I tests safety and dosage on a small group, focusing on side effects. Phase II evaluates effectiveness on a larger group and further assesses safety. Phase III involves a much larger group to confirm effectiveness, monitor side effects, and compare it with standard treatments. Finally, Phase IV occurs after approval to continue monitoring long-term effects.",
+    "resources": [
+      {
+        "url": "https://www.fda.gov/patients/drug-development-process/step-3-clinical-research",
+        "estimated_reading_time_minutes": 10,
+        "user_estimated_time_minutes": 15
+      },
+      {
+        "url": "https://www.nih.gov/health-information/nih-clinical-research-trials-you/basics",
+        "estimated_reading_time_minutes": 12,
+        "user_estimated_time_minutes": 15
+      }
+    ],
+    "quality_rating": 3,
+    "usefulness_rating": 3,
+    "comments": ""
+  },
+  {
+    "topic": "Evidence-Based Practice",
+    "explanation": "Evidence\u2011Based Practice (EBP) is a healthcare approach that combines the best available research evidence with clinical expertise and patient values to make informed care decisions. It typically involves defining a clear clinical question, systematically searching for high\u2011quality evidence, critically appraising that evidence for validity and relevance, integrating findings with provider experience and patient preferences, evaluating the outcomes of implemented decisions, and disseminating results to inform future care. This method aims to improve patient outcomes, enhance safety, reduce variability in practice, and optimize resource use.",
+    "resources": [
+      {
+        "url": "https://www.ahrq.gov/evidencenow/tools/ebp-tutorial.html",
+        "estimated_reading_time_minutes": 20,
+        "user_estimated_time_minutes": 4
+      },
+      {
+        "url": "https://www.summahealth.org/supportservices/nursingservices/center-for-clinical-inquiry/evidence-based-practice",
+        "estimated_reading_time_minutes": 10,
+        "user_estimated_time_minutes": 15
+      },
+      {
+        "url": "https://www.phoenix.edu/articles/healthcare/what-is-evidence-based-practice.html",
+        "estimated_reading_time_minutes": 12,
+        "user_estimated_time_minutes": 12
+      }
+    ],
+    "quality_rating": 4,
+    "usefulness_rating": 3,
+    "comments": ""
+  },
+  {
+    "topic": "Telemedicine",
+    "explanation": "Telemedicine refers to the delivery of healthcare services where distance is a critical factor. It uses technology and telecommunications to provide clinical services remotely, enabling patients to access healthcare from their homes or other locations. It is especially beneficial for reaching underserved populations and offers convenience, reduced travel, and improved access to specialists.",
+    "resources": [
+      {
+        "url": "https://www.healthit.gov/topic/health-it-initiatives/telemedicine-and-telehealth",
+        "estimated_reading_time_minutes": 15,
+        "user_estimated_time_minutes": 5
+      },
+      {
+        "url": "https://www.who.int/news-room/fact-sheets/detail/telehealth",
+        "estimated_reading_time_minutes": 10,
+        "user_estimated_time_minutes": 0
+      }
+    ],
+    "quality_rating": 1,
+    "usefulness_rating": 1,
+    "comments": ""
+  },
+  {
+    "topic": "Behavioral Interview Questions (STAR method)",
+    "explanation": "The STAR method is a structured way to answer behavioral interview questions by guiding responses through four clear stages: Situation (set context), Task (define your role), Action (explain what you did), and Result (share the outcome). This approach ensures your response is concise, focused on your personal contribution, and demonstrates measurable impact\u2014helping employers assess your real-world skills and behavior.",
+    "resources": [
+      {
+        "url": "https://www.indeed.com/career-advice/interviewing/how-to-use-the-star-interview-response-technique",
+        "estimated_reading_time_minutes": 10,
+        "user_estimated_time_minutes": 20
+      },
+      {
+        "url": "https://www.scienceofpeople.com/star-interview-method/",
+        "estimated_reading_time_minutes": 12,
+        "user_estimated_time_minutes": 40
+      },
+      {
+        "url": "https://careercenter.tamu.edu/blog-graduate-students-career-readiness/april-2020/the-s-t-a-r-method-for-behavioral-interviews",
+        "estimated_reading_time_minutes": 8,
+        "user_estimated_time_minutes": 5
+      }
+    ],
+    "quality_rating": 5,
+    "usefulness_rating": 5,
+    "comments": ""
+  },
+  {
+    "topic": "Employee Onboarding",
+    "explanation": "Employee onboarding is the structured process of integrating a new employee into an organization, beginning even before their first day. It involves setting clear role expectations, introducing company culture and values, facilitating essential training, and building social connections through mentors or buddies. Effective onboarding spans the first day, week, and extends to the 30\u201390 day period to ensure new hires feel supported, confident, productive, and committed, ultimately improving retention and long-term performance.",
+    "resources": [
+      {
+        "url": "https://www.forbes.com/advisor/business/onboarding-best-practices/",
+        "estimated_reading_time_minutes": 12,
+        "user_estimated_time_minutes": 12
+      },
+      {
+        "url": "https://www.shrm.org/in/topics-tools/topics/onboarding/process",
+        "estimated_reading_time_minutes": 15,
+        "user_estimated_time_minutes": 4
+      },
+      {
+        "url": "https://www.sage.com/en-us/blog/employee-onboarding-process/",
+        "estimated_reading_time_minutes": 10,
+        "user_estimated_time_minutes": 30
+      }
+    ],
+    "quality_rating": 3,
+    "usefulness_rating": 2,
+    "comments": ""
+  },
+  {
+    "topic": "Performance Management",
+    "explanation": "Performance management is an ongoing, collaborative process between a supervisor and an employee that focuses on setting clear expectations, monitoring progress, providing continuous feedback, and supporting development. It is cyclical\u2014often involving planning, monitoring, evaluating, and adjusting\u2014and replaces the outdated model of annual-only reviews. Key elements include goal alignment (often using SMART criteria), regular check-ins, constructive two-way feedback, coaching, and recognition or rewards, all aimed at driving performance, engagement, and growth.",
+    "resources": [
+      {
+        "url": "https://blog.clearcompany.com/performance-management-best-practices",
+        "estimated_reading_time_minutes": 7,
+        "user_estimated_time_minutes": 8
+      },
+      {
+        "url": "https://www.coursera.org/articles/performance-management",
+        "estimated_reading_time_minutes": 5,
+        "user_estimated_time_minutes": 15
+      },
+      {
+        "url": "https://www.upwork.com/resources/performance-management",
+        "estimated_reading_time_minutes": 13,
+        "user_estimated_time_minutes": 20
+      }
+    ],
+    "quality_rating": 5,
+    "usefulness_rating": 5,
+    "comments": ""
+  },
+  {
+    "topic": "Diversity and Inclusion in the Workplace",
+    "explanation": "Diversity and Inclusion (D&I) in the workplace refers to the implementation of policies and programs designed to foster an environment where diverse groups of people can participate and contribute. It involves recognizing and valuing differences such as race, gender, age, sexual orientation, and other identities while promoting a culture of respect, equity, and accessibility. Successful D&I initiatives improve organizational performance, employee satisfaction, and innovation by creating a more balanced and fair working environment.",
+    "resources": [
+      {
+        "url": "https://www.catalyst.org/research/why-diversity-and-inclusion-matter",
+        "estimated_reading_time_minutes": 15,
+        "user_estimated_time_minutes": 14
+      },
+      {
+        "url": "https://www.forbes.com/sites/karenhigginbottom/2023/06/01/the-benefits-of-diversity-in-the-workplace/?sh=7fb0f5a57e89",
+        "estimated_reading_time_minutes": 10,
+        "user_estimated_time_minutes": 0
+      },
+      {
+        "url": "https://www.shrm.org/resourcesandtools/tools-and-samples/toolkits/pages/developingdiversityandinclusionprograms.aspx",
+        "estimated_reading_time_minutes": 20,
+        "user_estimated_time_minutes": 0
+      }
+    ],
+    "quality_rating": 2,
+    "usefulness_rating": 1,
+    "comments": ""
+  },
+  {
+    "topic": "Contract Law Basics",
+    "explanation": "Contract law centers on legally enforceable agreements between parties. For a contract to be valid, it generally must include: an offer and acceptance (mutual assent), consideration (something of value exchanged), legal capacity of the parties, and a lawful purpose. These elements ensure that promises are binding and enforceable. Remedies for breach of contract\u2014such as expectation damages, reliance damages, or specific performance\u2014serve to compensate or enforce compliance with the agreement. Additionally, doctrines like promissory estoppel and unjust enrichment may enforce promises in the absence of a formal contract to prevent injustice.",
+    "resources": [
+      {
+        "url": "https://www.law.cornell.edu/wex/contract",
+        "estimated_reading_time_minutes": 10,
+        "user_estimated_time_minutes": 10
+      },
+      {
+        "url": "https://www.findlaw.com/smallbusiness/business-contracts-forms/contract-law.html",
+        "estimated_reading_time_minutes": 8,
+        "user_estimated_time_minutes": 8
+      },
+      {
+        "url": "https://www.docjuris.com/post/contract-law-fundamental-concepts-and-principles-explained",
+        "estimated_reading_time_minutes": 7,
+        "user_estimated_time_minutes": 10
+      }
+    ],
+    "quality_rating": 2,
+    "usefulness_rating": 2,
+    "comments": ""
+  },
+  {
+    "topic": "Intellectual Property (IP)",
+    "explanation": "Intellectual Property (IP) refers to creations of the mind for which exclusive rights are legally recognized. There are several types of IP: patents protect inventions and processes, trademarks safeguard brand names and logos, and copyrights secure creative works like music and literature. IP is crucial for encouraging innovation and creativity by ensuring inventors and creators can earn recognition and financial benefits from their work.",
+    "resources": [
+      {
+        "url": "https://www.wipo.int/about-ip/en/",
+        "estimated_reading_time_minutes": 15,
+        "user_estimated_time_minutes": 15
+      },
+      {
+        "url": "https://www.uspto.gov/ip-policy",
+        "estimated_reading_time_minutes": 10,
+        "user_estimated_time_minutes": 2
+      }
+    ],
+    "quality_rating": 2,
+    "usefulness_rating": 2,
+    "comments": ""
+  },
+  {
+    "topic": "BCG Matrix",
+    "explanation": "The BCG Matrix, also known as the Boston Consulting Group Matrix, is a tool used in portfolio management to evaluate the strategic position of a company\u2019s business units or products. It categorizes these into four quadrants: Stars, Cash Cows, Question Marks, and Dogs, based on their market growth rate and relative market share. Stars represent high growth and high market share. Cash Cows have low growth but high market share, generating steady revenue. Question Marks have high growth potential but low market share and require investment to become Stars. Dogs have low growth and low market share and might be divested.",
+    "resources": [
+      {
+        "url": "https://hbr.org/1970/01/the-product-portfolio",
+        "estimated_reading_time_minutes": 15,
+        "user_estimated_time_minutes": 0
+      },
+      {
+        "url": "https://www.mindtools.com/pages/article/newSTR_95.htm",
+        "estimated_reading_time_minutes": 10,
+        "user_estimated_time_minutes": 2
+      }
+    ],
+    "quality_rating": 1,
+    "usefulness_rating": 1,
+    "comments": ""
+  },
+  {
+    "topic": "Porter's Five Forces",
+    "explanation": "Porter's Five Forces is a framework for analyzing the competitive forces within an industry. It identifies five forces that shape every market: the threat of new entrants, the bargaining power of suppliers, the bargaining power of buyers, the threat of substitute products or services, and the intensity of competitive rivalry. By understanding these forces, businesses can develop strategies to improve their competitive position.",
+    "resources": [
+      {
+        "url": "https://www.investopedia.com/terms/p/porter.asp",
+        "estimated_reading_time_minutes": 12,
+        "user_estimated_time_minutes": 15
+      },
+      {
+        "url": "https://hbr.org/1979/03/how-competitive-forces-shape-strategy",
+        "estimated_reading_time_minutes": 10,
+        "user_estimated_time_minutes": 1
+      }
+    ],
+    "quality_rating": 4,
+    "usefulness_rating": 5,
+    "comments": "There was a subscriber only page"
+  }
+]

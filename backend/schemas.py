@@ -44,3 +44,18 @@ class TrainRequest(BaseModel):
     Defines the data structure for a request to get training materials for a specific task.
     """
     quest: str = Field(..., description="The description of the task to get training materials for.")
+
+
+class TrainingResource(BaseModel):
+    """
+    Represents a single online resource for training.
+    """
+    url: str = Field(..., description="The URL of the training resource.")
+    estimated_reading_time_minutes: int = Field(..., description="The estimated time to read the resource in minutes.")
+
+class TrainingMaterial(BaseModel):
+    """
+    Represents the complete training material for a specific task.
+    """
+    explanation: str = Field(..., description="A short, clear explanation of the concept.")
+    resources: List[TrainingResource] = Field(..., description="A list of high-quality online resources.")

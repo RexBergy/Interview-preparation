@@ -43,7 +43,7 @@ class Task(BaseModel):
     """Name of the task/quest (e.g., 'Mastering SQL Joins' or 'STAR Method Practice')."""
 
     description: str
-    """Actionable description (10-20 words)."""
+    """Actionable description (10-20 words). Write the task duration here as well"""
 
     duration: int
     """Duration in minutes."""

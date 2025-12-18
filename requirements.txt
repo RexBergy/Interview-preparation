@@ -7,3 +7,5 @@ pandas
 python-dateutil
 fastapi
 uvicorn
+matplotlib
+seaborn
